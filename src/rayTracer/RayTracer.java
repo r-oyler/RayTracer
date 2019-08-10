@@ -150,7 +150,7 @@ public class RayTracer extends JPanel {
 
 	public static void main(String args[]) {
 
-		int scene = 2;
+		int scene = 3;
 
 		// Switch statement to have multiple scene setups
 		switch(scene) {
@@ -174,13 +174,13 @@ public class RayTracer extends JPanel {
 		{
 			Sphere s = new Sphere(new Vector(0,0,0), Material.TEST_RED, 1);
 
-			Vector camPos1 = new Vector(0,0,3);
-			Vector ligPos1 = new Vector(2,0,3);
+			Vector camPos = new Vector(0,0,3);
+			Vector ligPos = new Vector(2,0,3);
 
 			objects.add(s);
-			lights.add(new Light(ligPos1,PlanetPixel.DIRECT_SUNLIGHT));
+			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			CAMERA_POSITION = camPos1;
+			CAMERA_POSITION = camPos;
 			viewMatrix = Matrix4.lookAt(CAMERA_POSITION, s.Position(), new Vector(0,1,0));
 
 			break;
@@ -194,26 +194,48 @@ public class RayTracer extends JPanel {
 
 			Vector centre = (p0.plus(p1).plus(p2).plus(p3)).divide(4);
 
-			Triangle t0 = Triangle.revTriangle(p0,p1,p2, Material.TEST_RED);
-			Triangle t1 = Triangle.revTriangle(p1,p0,p3, Material.TEST_GREEN);
-			Triangle t2 = Triangle.revTriangle(p2,p1,p3, Material.TEST_BLUE);
-			Triangle t3 = Triangle.revTriangle(p0,p2,p3, Material.TEST_YELLOW);
+			Triangle t0 = new Triangle(p0,p1,p2, Material.TEST_RED);
+			Triangle t1 = new Triangle(p1,p0,p3, Material.TEST_GREEN);
+			Triangle t2 = new Triangle(p2,p1,p3, Material.TEST_BLUE);
+			Triangle t3 = new Triangle(p0,p2,p3, Material.TEST_YELLOW);
 
-			Vector camPos2 = new Vector(0,0,3);
-			Vector ligPos2 = camPos2;
+			Vector camPos = new Vector(0,0,3);
+			Vector ligPos = camPos;
 
 			objects.add(t0);
 			objects.add(t1);
 			objects.add(t2);
 			objects.add(t3);
 
-			lights.add(new Light(ligPos2,PlanetPixel.DIRECT_SUNLIGHT));
+			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			CAMERA_POSITION = camPos2;
+			CAMERA_POSITION = camPos;
 			viewMatrix = Matrix4.lookAt(CAMERA_POSITION, centre, new Vector(0,1,0));
 
 			break;
 		}
+		
+		case 3:{
+			
+			Vector p0 = new Vector(0,0,0);
+			Vector p1 = new Vector(0,1,0);
+			Vector p2 = new Vector(1,0,0);
+			
+			Triangle t = new Triangle(p0,p1,p2, Material.TEST_RED);
+
+			Vector camPos = new Vector(0,0,1);
+			Vector ligPos = camPos;
+
+			objects.add(t);
+			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			CAMERA_POSITION = camPos;
+			viewMatrix = Matrix4.lookAt(CAMERA_POSITION, t.centre(), new Vector(0,1,0));
+
+			
+			break;
+		}
+		
 		}
 
 
