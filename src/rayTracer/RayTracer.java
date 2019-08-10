@@ -149,7 +149,9 @@ public class RayTracer extends JPanel {
 
 
 	public static void main(String args[]) {
-
+		
+		long startTime = System.currentTimeMillis();
+		
 		int scene = 3;
 
 		// Switch statement to have multiple scene setups
@@ -248,6 +250,15 @@ public class RayTracer extends JPanel {
 		double fov = 90.0f;
 		//Value for adjusting the pixel position to account for the field of view
 		double fovAdjust = (double) Math.tan(fov*0.5f *(Math.PI/180.0f));
+		
+		// Supersampling values
+		int ssColumnMax = 2;
+		int ssRowMax = 2;
+		
+		int totalSubPixels = ssColumnMax * ssRowMax;
+		
+		double columnMargin = (1f/(2*ssColumnMax));
+		double rowMargin = (1f/(2*ssRowMax));
 
 		try {
 			BufferedImage img = new BufferedImage(windowX, windowY, BufferedImage.TYPE_INT_ARGB);
@@ -255,63 +266,79 @@ public class RayTracer extends JPanel {
 			for (int column = 0; column < windowX; column++) {
 				for (int row = 0; row < windowY; row++) {
 
-					//Convert the pixel (Raster space coordinates: (0->ScreenWidth,0->ScreenHeight)) to NDC (Normalised Device Coordinates: (0->1,0->1))
-					double pixelNormX = (column+0.5f)/windowX; //Add 0.5f to get centre of pixel
-					double pixelNormY = (row+0.5f)/windowY;
-					//Convert from NDC, (0->1,0->1), to Screen space (-1->1,-1->1).  These coordinates correspond to those used by OpenGL
-					//Note coordinate (-1,1) in screen space corresponds to coordinate (0,0) in raster space i.e. column = 0, row = 0
-					double pixelScreenX = 2.0f*pixelNormX - 1.0f;
-					double pixelScreenY = 1.0f-2.0f*pixelNormY;
-
-					//Account for Field of View			
-					double pixelCameraX = pixelScreenX * fovAdjust;
-					double pixelCameraY = pixelScreenY * fovAdjust;
-
-					//Account for image aspect ratio
-					pixelCameraX *= aspectRatio;
-
-					//Put pixel into camera space (offset by 1 unit along camera facing direction i.e. negative z axis)
-					Vector pixelCameraSpace = new Vector(pixelCameraX,pixelCameraY,-1.0,1.0);
-
-					//ray comes from camera origin
-					Vector rayOrigin = new Vector(0.0f,0.0f,0.0f,1.0f);
-
-					//Transform from camera space to world space
-					pixelCameraSpace = viewMatrix.times(pixelCameraSpace);
-					//The origin of the ray we are casting
-					rayOrigin = viewMatrix.times(rayOrigin);
-
-					// Drop 4th dimension for rayOrigin and pixelCameraSpace
-					rayOrigin = rayOrigin.dropDim();
-					pixelCameraSpace = pixelCameraSpace.dropDim();
-
-					//The direction the ray is travelling in
-					Vector rayDirection = pixelCameraSpace.minus(rayOrigin).normalize();
-
-					//Set up ray in world space
-					Ray ray = new Ray(rayOrigin,rayDirection);
-
-					//Structure for storing the information we get from casting the ray
-					Payload payload = new Payload();
-
-					payload.setNumBounces(0);
-
-					Vector color = BACKGROUND_COLOR;
+					// Color of pixel, super samples are added to here
+					Vector pixelColor = new Vector(0,0,0);
 					
-					//Cast our ray into the scene
-					if(CastRay(ray,payload)>0.0){// > 0.0f indicates an intersection
-						color = payload.getColor();
-					}	
+					for (int ssColumn = 0; ssColumn < ssColumnMax; ssColumn++) {
+						for (int ssRow = 0; ssRow < ssRowMax; ssRow++) {
+						
+							//Convert the pixel (Raster space coordinates: (0->ScreenWidth,0->ScreenHeight)) to NDC (Normalised Device Coordinates: (0->1,0->1))
+							double pixelNormX = (column+columnMargin+(ssColumn*2*columnMargin))/windowX; //Add 0.5f to get centre of pixel
+							double pixelNormY = (row+rowMargin+(ssRow*2*rowMargin))/windowY;
+							//Convert from NDC, (0->1,0->1), to Screen space (-1->1,-1->1).  These coordinates correspond to those used by OpenGL
+							//Note coordinate (-1,1) in screen space corresponds to coordinate (0,0) in raster space i.e. column = 0, row = 0
+							double pixelScreenX = 2.0f*pixelNormX - 1.0f;
+							double pixelScreenY = 1.0f-2.0f*pixelNormY;
 
+							//Account for Field of View			
+							double pixelCameraX = pixelScreenX * fovAdjust;
+							double pixelCameraY = pixelScreenY * fovAdjust;
+
+							//Account for image aspect ratio
+							pixelCameraX *= aspectRatio;
+
+							//Put pixel into camera space (offset by 1 unit along camera facing direction i.e. negative z axis)
+							Vector pixelCameraSpace = new Vector(pixelCameraX,pixelCameraY,-1.0,1.0);
+
+							//ray comes from camera origin
+							Vector rayOrigin = new Vector(0.0f,0.0f,0.0f,1.0f);
+
+							//Transform from camera space to world space
+							pixelCameraSpace = viewMatrix.times(pixelCameraSpace);
+							//The origin of the ray we are casting
+							rayOrigin = viewMatrix.times(rayOrigin);
+
+							// Drop 4th dimension for rayOrigin and pixelCameraSpace
+							rayOrigin = rayOrigin.dropDim();
+							pixelCameraSpace = pixelCameraSpace.dropDim();
+
+							//The direction the ray is travelling in
+							Vector rayDirection = pixelCameraSpace.minus(rayOrigin).normalize();
+
+							//Set up ray in world space
+							Ray ray = new Ray(rayOrigin,rayDirection);
+
+							//Structure for storing the information we get from casting the ray
+							Payload payload = new Payload();
+
+							payload.setNumBounces(0);
+
+							Vector color = BACKGROUND_COLOR;
+							
+							//Cast our ray into the scene
+							if(CastRay(ray,payload)>0.0){// > 0.0f indicates an intersection
+								color = payload.getColor();
+							}	
+
+							// Divide ray payload by number of subpixels and add to total
+							pixelColor = pixelColor.plus(color.divide(totalSubPixels));
+							
+						}
+					}
+					
 					for (int i = 0; i<3; i++) {
-						color.d[i] = Util.clamp(color.d[i], 0, 255);
+						pixelColor.d[i] = Util.clamp(pixelColor.d[i], 0, 255);
 					}
 
-					Color tempColor = new Color((int)color.d[0],(int)color.d[1],(int)color.d[2]);
+					Color tempColor = new Color((int)pixelColor.x(),(int)pixelColor.y(),(int)pixelColor.z());
 
 					img.setRGB(column, row, tempColor.getRGB());
-
+					
 				}
+				
+				double percent = ((double)column*100)/((double)windowX);
+				System.out.println(percent + "%");
+				
 			}
 
 			File outputfile = new File("saved.png");
@@ -320,9 +347,11 @@ public class RayTracer extends JPanel {
 			Desktop dt = Desktop.getDesktop();
 			dt.open(outputfile);
 
-			System.out.println(hits);
-			System.out.println(AABB.normals);
-
+			long endTime = System.currentTimeMillis();
+			long elapsedTime = endTime - startTime;
+			
+			System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
+			
 		}
 		catch (IOException e) {
 			e.printStackTrace();
