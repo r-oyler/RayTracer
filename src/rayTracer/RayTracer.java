@@ -36,8 +36,8 @@ public class RayTracer extends JPanel {
 		double fov = 90.0f;
 		
 		// Settings for supersampling anti-aliasing
-		int ssColumnMax = 2;
-		int ssRowMax = 2;
+		int ssColumnMax = 1;
+		int ssRowMax = 1;
 		
 		// Maximum depth that reflection/refraction rays are cast
 		int maxRecursionDepth = 7;
@@ -64,7 +64,7 @@ public class RayTracer extends JPanel {
 		// Transforms from world-space to view-space, assigned in scene setup
 		Matrix4 viewMatrix = null;
 		
-		int scene = 3;
+		int scene = 4;
 	
 		// Switch statement to have multiple scene setups
 		switch(scene) {
@@ -144,6 +144,22 @@ public class RayTracer extends JPanel {
 	
 	
 			break;
+		}
+		
+		case 4:{
+			
+			Vector p0 = new Vector(0,0,0);
+			Vector n = new Vector(1,1,1);
+			
+			Disk d = new Disk(p0, Material.TEST_RED, n, 1);
+			
+			Vector camPos = new Vector(0,0,5);
+			Vector ligPos = camPos;
+			
+			objects.add(d);
+			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			
+			viewMatrix = Matrix4.lookAt(camPos, p0, new Vector(0,1,0));
 		}
 	
 		}
