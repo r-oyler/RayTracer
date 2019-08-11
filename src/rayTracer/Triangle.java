@@ -79,9 +79,9 @@ public class Triangle extends MatObject {
 			Vector p2;
 
 
-			if (this.normal.d[0] >= this.normal.d[1]) { // x or z is largest
+			if (this.normal.x() >= this.normal.y()) { // x or z is largest
 
-				if (this.normal.d[0] >= this.normal.d[2]) { // x is largest
+				if (this.normal.x() >= this.normal.z()) { // x is largest
 					p = new Vector(hitPoint.d[1],hitPoint.d[2]);
 					p0 = new Vector(this.p0.d[1],this.p0.d[2]);
 					p1 = new Vector(this.p1.d[1],this.p1.d[2]);

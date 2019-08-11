@@ -22,7 +22,7 @@ public class Matrix4{
 	}
 
 	public static Matrix4 translationMatrix(Vector p) {
-		return translationMatrix(p.d[0],p.d[1],p.d[2]);
+		return translationMatrix(p.x(),p.y(),p.z());
 	}
 
 	Matrix4 add(Matrix4 m) {
@@ -94,19 +94,19 @@ public class Matrix4{
 
 			double[][] camToWorld = new double[4][4]; 
 
-			camToWorld[0][0] = right.d[0]; 
-			camToWorld[1][0] = right.d[1]; 
-			camToWorld[2][0] = right.d[2]; 
-			camToWorld[0][1] = up.d[0]; 
-			camToWorld[1][1] = up.d[1]; 
-			camToWorld[2][1] = up.d[2]; 
-			camToWorld[0][2] = forward.d[0]; 
-			camToWorld[1][2] = forward.d[1]; 
-			camToWorld[2][2] = forward.d[2]; 
+			camToWorld[0][0] = right.x(); 
+			camToWorld[1][0] = right.y(); 
+			camToWorld[2][0] = right.z(); 
+			camToWorld[0][1] = up.x(); 
+			camToWorld[1][1] = up.y(); 
+			camToWorld[2][1] = up.z(); 
+			camToWorld[0][2] = forward.x(); 
+			camToWorld[1][2] = forward.y(); 
+			camToWorld[2][2] = forward.z(); 
 
-			camToWorld[0][3] = from.d[0]; 
-			camToWorld[1][3] = from.d[1]; 
-			camToWorld[2][3] = from.d[2]; 
+			camToWorld[0][3] = from.x(); 
+			camToWorld[1][3] = from.y(); 
+			camToWorld[2][3] = from.z(); 
 
 			return new Matrix4(camToWorld); 
 		} 

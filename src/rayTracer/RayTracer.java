@@ -323,9 +323,9 @@ public class RayTracer extends JPanel {
 
 					boolean b = true;
 
-					b &= (reflection.d[0] == 0.0);
-					b &= (reflection.d[1] == 0.0);
-					b &= (reflection.d[2] == 0.0);
+					b &= (reflection.x() == 0.0);
+					b &= (reflection.y() == 0.0);
+					b &= (reflection.z() == 0.0);
 
 					if (b) {
 						System.out.println("Error");

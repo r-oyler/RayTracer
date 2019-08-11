@@ -73,7 +73,7 @@ public class AABB extends MatObject {
 
 			Vector normal = calcNormal(hitPoint);
 						
-			if (normal.d[0] == 0f && normal.d[1] == 0f && normal.d[2] == 1f) {
+			if (normal.x() == 0f && normal.y() == 0f && normal.z() == 1f) {
 				normals++;
 			}
 			
