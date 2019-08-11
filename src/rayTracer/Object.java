@@ -25,8 +25,6 @@ abstract class MatObject extends Object {
 
 	MatObject(Vector p, Material m){
 		super(p);
-		this.p0 = p;
-		this.transform = Matrix4.translationMatrix(p);
 		this.material = m;
 	}
 
@@ -50,95 +48,83 @@ abstract class MatObject extends Object {
 class Material{
 
 	//Material values used for lighting equations
+	boolean isAmbient = false;
 	Vector ambient;
+	
+	boolean isDiffuse = false;
 	Vector diffuse;
+	
+	boolean isSpecular = false;
 	Vector specular;
-	double specularExponent;
+	double specularExponent = 0;
+	
+	boolean isReflective = false;
+	double reflectionCoefficient = 0;
+	
 	//Name, useful for debugging
 	String name;
 
-
-
-	static Material TEST_RED = new Material(
-			new Vector(1,0,0),
-			new Vector(1,0,0),
-			new Vector(0.7,0.7,0.7),
-			200,
-			"TEST_RED"
-			);
-
-	static Material TEST_GREEN = new Material(
-			new Vector(0,1,0),
-			new Vector(0,1,0),
-			new Vector(0,1,0),
-			200,
-			"TEST_GREEN"
-			);
-
-	static Material TEST_BLUE = new Material(
-			new Vector(0,0,1),
-			new Vector(0,0,1),
-			new Vector(0,0,1),
-			200,
-			"TEST_BLUE"
-			);
-
-	static Material TEST_YELLOW = new Material(
-			new Vector(1,1,0),
-			new Vector(1,1,0),
-			new Vector(1,1,0),
-			200,
-			"TEST_YELLOW"
-			);
-
-	static Material TEST_MAGENTA = new Material(
-			new Vector(1,0,1),
-			new Vector(1,0,1),
-			new Vector(1,0,1),
-			200,
-			"TEST_MAGENTA"
-			);
-
-	static Material TEST_CYAN = new Material(
-			new Vector(0,1,1),
-			new Vector(0,1,1),
-			new Vector(0,1,1),
-			200,
-			"TEST_CYAN"
-			);
-
-	static Material MIRROR = new Material(
-			new Vector(0,0,0),
-			new Vector(0,0,0),
-			new Vector(1,1,1),
-			1,
-			"MIRROR"
-			);
-	
-	Material(Vector a, Vector d, Vector s, double se, String n){
-		ambient = a;
-		diffuse = d;
-		specular = s;
-		specularExponent = se;
+	Material(String n){
 		name = n;
 	}
 
+	public void setAmbient(Vector a) {
+		isAmbient = true;
+		ambient = a;
+	}
+	
+	public void setDiffuse(Vector d) {
+		isDiffuse = true;
+		diffuse = d;
+	}
+	
+	public void setSpecular(Vector s, double se) {
+		isSpecular = true;
+		specular = s;
+		specularExponent = se;
+	}
+	
+	public void setReflective(double r) {
+		isReflective = true;
+		reflectionCoefficient = r;
+	}
+	
+	static Material RED = new Material("TEST_RED");
+	static Material GREEN = new Material("TEST_GREEN");
+	static Material BLUE = new Material("TEST_BLUE");
+	static Material YELLOW = new Material("TEST_YELLOW");
+	static Material BLACK = new Material("TEST_BLACK");
+	static Material MIRROR = new Material("MIRROR");
+	
+	static {
+		RED.setAmbient(new Vector(1,0,0));
+		RED.setDiffuse(new Vector(1,0,0));
+		RED.setSpecular(new Vector(0.7,0.7,0.7), 200);
+		
+		GREEN.setAmbient(new Vector(0,1,0));
+		GREEN.setDiffuse(new Vector(0,1,0));
+		GREEN.setSpecular(new Vector(0.7,0.7,0.7), 200);
+		
+		BLUE.setAmbient(new Vector(0,0,1));
+		BLUE.setDiffuse(new Vector(0,0,1));
+		BLUE.setSpecular(new Vector(0.7,0.7,0.7), 200);
+		
+		YELLOW.setAmbient(new Vector(1,1,0));
+		YELLOW.setDiffuse(new Vector(1,1,0));
+		YELLOW.setSpecular(new Vector(0.7,0.7,0.7), 200);
+		
+		BLACK.setAmbient(new Vector(0.2,0.2,0.2));
+		BLACK.setDiffuse(new Vector(0.2,0.2,0.2));
+		BLACK.setSpecular(new Vector(0.7,0.7,0.7), 200);
+		
+		MIRROR.setReflective(0.8);
+	}
+	
 	@Override
 	public String toString() {
 		return "Material [name=" + name + "]";
 	}
 
-	public static Material randomMat() {
-		int total = Devernay.count + Barradeau.count;
-		int r = (int) (Math.random()*total);
-		if (r<Devernay.count) {
-			return Devernay.RANDOM_MATERIAL();
-		}
-		else {
-			return Barradeau.RANDOM_MATERIAL();
-		}
-	}
-
-	//TODO add further material values here such as reflection/refraction index
+	//TODO add further material values here such as refraction index
 
 }
