@@ -82,33 +82,33 @@ public class Triangle extends MatObject {
 			if (this.normal.x() >= this.normal.y()) { // x or z is largest
 
 				if (this.normal.x() >= this.normal.z()) { // x is largest
-					p = new Vector(hitPoint.d[1],hitPoint.d[2]);
-					p0 = new Vector(this.p0.d[1],this.p0.d[2]);
-					p1 = new Vector(this.p1.d[1],this.p1.d[2]);
-					p2 = new Vector(this.p2.d[1],this.p2.d[2]);
+					p = new Vector(hitPoint.y(),hitPoint.z());
+					p0 = new Vector(this.p0.y(),this.p0.z());
+					p1 = new Vector(this.p1.y(),this.p1.z());
+					p2 = new Vector(this.p2.y(),this.p2.z());
 				}
 				else { // z is largest
-					p = new Vector(hitPoint.d[0],hitPoint.d[1]);
-					p0 = new Vector(this.p0.d[0],this.p0.d[1]);
-					p1 = new Vector(this.p1.d[0],this.p1.d[1]);
-					p2 = new Vector(this.p2.d[0],this.p2.d[1]);
+					p = new Vector(hitPoint.x(),hitPoint.y());
+					p0 = new Vector(this.p0.x(),this.p0.y());
+					p1 = new Vector(this.p1.x(),this.p1.y());
+					p2 = new Vector(this.p2.x(),this.p2.y());
 				}
 
 			}
 
 			else { // y or z is largest
 
-				if (this.normal.d[1] >= this.normal.d[2]) { // y is largest
-					p = new Vector(hitPoint.d[0],hitPoint.d[2]);
-					p0 = new Vector(this.p0.d[0],this.p0.d[2]);
-					p1 = new Vector(this.p1.d[0],this.p1.d[2]);
-					p2 = new Vector(this.p2.d[0],this.p2.d[2]);
+				if (this.normal.y() >= this.normal.z()) { // y is largest
+					p = new Vector(hitPoint.x(),hitPoint.z());
+					p0 = new Vector(this.p0.x(),this.p0.z());
+					p1 = new Vector(this.p1.x(),this.p1.z());
+					p2 = new Vector(this.p2.x(),this.p2.z());
 				}
 				else { // z is largest
-					p = new Vector(hitPoint.d[0],hitPoint.d[1]);
-					p0 = new Vector(this.p0.d[0],this.p0.d[1]);
-					p1 = new Vector(this.p1.d[0],this.p1.d[1]);
-					p2 = new Vector(this.p2.d[0],this.p2.d[1]);
+					p = new Vector(hitPoint.x(),hitPoint.y());
+					p0 = new Vector(this.p0.x(),this.p0.y());
+					p1 = new Vector(this.p1.x(),this.p1.y());
+					p2 = new Vector(this.p2.x(),this.p2.y());
 				}
 
 			}
@@ -136,7 +136,7 @@ public class Triangle extends MatObject {
 
 	static double baryFunc(Vector pA, Vector pB, Vector p) {
 
-		return (pA.d[1] - pB.d[1])*p.d[0] + (pB.d[0] - pA.d[0])*p.d[1] + pA.d[0]*pB.d[1] - pB.d[0]*pA.d[1] ;
+		return (pA.y() - pB.y())*p.x() + (pB.x() - pA.x())*p.y() + pA.x()*pB.y() - pB.x()*pA.y() ;
 
 	}
 
