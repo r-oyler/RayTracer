@@ -69,22 +69,33 @@ class Material{
 	}
 
 	public void setAmbient(Vector a) {
+		if(a.dim != 3) throw new IllegalArgumentException("Ambient reflection must be a vector with 3 elements: {red,green,blue}");
+		if (!a.elementsBetweenInc(0, 1)) throw new IllegalArgumentException("Ambient reflection must be a vector with all elements between 0 and 1 inclusive");
+		
 		isAmbient = true;
 		ambient = a;
 	}
 	
 	public void setDiffuse(Vector d) {
+		if(d.dim != 3) throw new IllegalArgumentException("Diffuse reflection must be a vector with 3 elements: {red,green,blue}");
+		if (!d.elementsBetweenInc(0, 1)) throw new IllegalArgumentException("Diffuse reflection must be a vector with all elements between 0 and 1 inclusive");
+		
 		isDiffuse = true;
 		diffuse = d;
 	}
 	
 	public void setSpecular(Vector s, double se) {
+		if(s.dim != 3) throw new IllegalArgumentException("Ambient reflection must be a vector with 3 elements: {red,green,blue}");
+		if (!s.elementsBetweenInc(0, 1)) throw new IllegalArgumentException("Ambient reflection must be a vector with all elements between 0 and 1 inclusive");
+		
 		isSpecular = true;
 		specular = s;
 		specularExponent = se;
 	}
 	
 	public void setReflective(double r) {
+		if (!Util.isBetweenInc(r, 0, 1)) throw new IllegalArgumentException("Reflection coefficient must be a value between 0 and 1 inclusive"); 
+		
 		isReflective = true;
 		reflectionCoefficient = r;
 	}

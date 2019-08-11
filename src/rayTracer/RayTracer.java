@@ -28,7 +28,7 @@ public class RayTracer extends JPanel {
 	//returns either the time of intersection with an object (the coefficient t in the equation: RayPosition = RayOrigin + t*RayDirection) or zero to indicate no intersection
 
 	public static void main(String args[]) {
-
+		
 		// Dimensions of image
 		int windowX = 640;
 		int windowY = 480;

@@ -228,6 +228,30 @@ public class Vector {
 		return this.d[2];
 	}
 
+	public boolean elementsBetweenInc(double min, double max) {
+
+		boolean result = true;
+
+		for (int i = 0; i<dim && result; i++) {
+			result &= Util.isBetweenInc(this.d[i], min, max);
+		}
+
+		return result;
+
+	}
+
+	public boolean elementsBetweenExc(double min, double max) {
+
+		boolean result = true;
+
+		for (int i = 0; i<dim && result; i++) {
+			result &= Util.isBetweenExc(this.d[i], min, max);
+		}
+
+		return result;
+
+	}
+
 	public String toString() {
 
 		String s = "(";
