@@ -27,6 +27,238 @@ public class RayTracer extends JPanel {
 	//@payload Information on the current ray i.e. the cumulative color and the number of bounces it has performed
 	//returns either the time of intersection with an object (the coefficient t in the equation: RayPosition = RayOrigin + t*RayDirection) or zero to indicate no intersection
 
+	public static void main(String args[]) {
+	
+		// Dimensions of image
+		int windowX = 640;
+		int windowY = 480;
+		//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
+		double fov = 90.0f;
+		
+		// Settings for supersampling anti-aliasing
+		int ssColumnMax = 2;
+		int ssRowMax = 2;
+		
+		// Maximum depth that reflection/refraction rays are cast
+		int maxRecursionDepth = 7;
+		// Distance that shadow ray orgins are moved along the surface normal to prevent shadow acne
+		double shadowRayBias = 0.0001; 
+		// The ambient light that is cast on every object
+		Vector ambientLight = new Vector(40f,40f,40f);
+		// The color that is seen when a ray doesn't hit an object;
+		Vector backgroundColor  = new Vector(20f,0f,20f);
+		
+		rayTrace(windowX, windowY, fov, ssColumnMax, ssRowMax, maxRecursionDepth, shadowRayBias, ambientLight, backgroundColor);
+	
+	}
+
+	public static void rayTrace(int windowX, int windowY, double fov, int ssColumnMax, int ssRowMax, int maxRecursionDepth, double shadowRayBias, Vector ambientLight, Vector backgroundColor) {
+	
+		// Assign parameters to static variables
+		RayTracer.maxRecursionDepth = maxRecursionDepth;
+		RayTracer.shadowRayBias = shadowRayBias;
+		RayTracer.ambientLight = ambientLight;
+	
+		long startTime = System.currentTimeMillis();
+	
+		// Transforms from world-space to view-space, assigned in scene setup
+		Matrix4 viewMatrix = null;
+		
+		int scene = 3;
+	
+		// Switch statement to have multiple scene setups
+		switch(scene) {
+	
+		case 0:
+		{
+			AABB aabb = new AABB(Material.TEST_RED, new Vector(0,0,0), new Vector(1,1,1));
+	
+			Vector camPos = new Vector(0.5,0.5,3);
+	
+			objects.add(aabb);
+			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+	
+			viewMatrix = Matrix4.lookAt(camPos, aabb.centre(), new Vector(0,1,0));
+	
+			break;
+		}
+	
+		case 1:
+		{
+			Sphere s = new Sphere(new Vector(0,0,0), Material.TEST_RED, 1);
+	
+			Vector camPos = new Vector(0,0,3);
+			Vector ligPos = new Vector(2,0,3);
+	
+			objects.add(s);
+			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+	
+			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
+	
+			break;
+		}
+		case 2:
+		{
+			Vector p0 = new Vector(0,0,0);
+			Vector p1 = new Vector(1,0,0);
+			Vector p2 = p0.plus(new Vector(1,0,1).normalize());
+			Vector p3 = new Vector(p2.x(),Math.sqrt(6)/3f,(p0.z()+p1.z()+p2.z())/3);	
+	
+			Vector centre = (p0.plus(p1).plus(p2).plus(p3)).divide(4);
+	
+			Triangle t0 = new Triangle(p0,p1,p2, Material.TEST_RED);
+			Triangle t1 = new Triangle(p1,p0,p3, Material.TEST_GREEN);
+			Triangle t2 = new Triangle(p2,p1,p3, Material.TEST_BLUE);
+			Triangle t3 = new Triangle(p0,p2,p3, Material.TEST_YELLOW);
+	
+			Vector camPos = new Vector(0,0,3);
+			Vector ligPos = camPos;
+	
+			objects.add(t0);
+			objects.add(t1);
+			objects.add(t2);
+			objects.add(t3);
+	
+			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+	
+			viewMatrix = Matrix4.lookAt(camPos, centre, new Vector(0,1,0));
+	
+			break;
+		}
+	
+		case 3:{
+	
+			Vector p0 = new Vector(0,0,0);
+			Vector p1 = new Vector(0,1,0);
+			Vector p2 = new Vector(1,0,0);
+	
+			Triangle t = new Triangle(p0,p1,p2, Material.TEST_RED);
+	
+			Vector camPos = new Vector(0,0,1);
+			Vector ligPos = camPos;
+	
+			objects.add(t);
+			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			
+			viewMatrix = Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0));
+	
+	
+			break;
+		}
+	
+		}
+	
+		//The window aspect ratio
+		double aspectRatio = (double)windowX/(double)windowY;
+		
+		//Value for adjusting the pixel position to account for the field of view
+		double fovAdjust = (double) Math.tan(fov*0.5f *(Math.PI/180.0f));
+	
+		// Values used for supersampling anti-aliasing
+		int totalSubPixels = ssColumnMax * ssRowMax;
+	
+		double columnMargin = (1f/(2*ssColumnMax));
+		double rowMargin = (1f/(2*ssRowMax));
+	
+		try {
+			BufferedImage img = new BufferedImage(windowX, windowY, BufferedImage.TYPE_INT_ARGB);
+	
+			for (int column = 0; column < windowX; column++) {
+				for (int row = 0; row < windowY; row++) {
+	
+					// Color of pixel, super samples are added to this
+					Vector pixelColor = new Vector(0,0,0);
+	
+					for (int ssColumn = 0; ssColumn < ssColumnMax; ssColumn++) {
+						for (int ssRow = 0; ssRow < ssRowMax; ssRow++) {
+	
+							//Convert the pixel (Raster space coordinates: (0->ScreenWidth,0->ScreenHeight)) to NDC (Normalised Device Coordinates: (0->1,0->1))
+							double pixelNormX = (column+columnMargin+(ssColumn*2*columnMargin))/windowX; //Add 0.5f to get centre of pixel
+							double pixelNormY = (row+rowMargin+(ssRow*2*rowMargin))/windowY;
+							//Convert from NDC, (0->1,0->1), to Screen space (-1->1,-1->1).  These coordinates correspond to those used by OpenGL
+							//Note coordinate (-1,1) in screen space corresponds to coordinate (0,0) in raster space i.e. column = 0, row = 0
+							double pixelScreenX = 2.0f*pixelNormX - 1.0f;
+							double pixelScreenY = 1.0f-2.0f*pixelNormY;
+	
+							//Account for Field of View			
+							double pixelCameraX = pixelScreenX * fovAdjust;
+							double pixelCameraY = pixelScreenY * fovAdjust;
+	
+							//Account for image aspect ratio
+							pixelCameraX *= aspectRatio;
+	
+							//Put pixel into camera space (offset by 1 unit along camera facing direction i.e. negative z axis)
+							Vector pixelCameraSpace = new Vector(pixelCameraX,pixelCameraY,-1.0,1.0);
+	
+							//ray comes from camera origin
+							Vector rayOrigin = new Vector(0.0f,0.0f,0.0f,1.0f);
+	
+							//Transform from camera space to world space
+							pixelCameraSpace = viewMatrix.times(pixelCameraSpace);
+							//The origin of the ray we are casting
+							rayOrigin = viewMatrix.times(rayOrigin);
+	
+							// Drop 4th dimension for rayOrigin and pixelCameraSpace
+							rayOrigin = rayOrigin.dropDim();
+							pixelCameraSpace = pixelCameraSpace.dropDim();
+	
+							//The direction the ray is travelling in
+							Vector rayDirection = pixelCameraSpace.minus(rayOrigin).normalize();
+	
+							//Set up ray in world space
+							Ray ray = new Ray(rayOrigin,rayDirection);
+	
+							//Structure for storing the information we get from casting the ray
+							Payload payload = new Payload();
+	
+							payload.setNumBounces(0);
+	
+							Vector color = backgroundColor;
+	
+							//Cast our ray into the scene
+							if(CastRay(ray,payload)>0.0){// > 0.0f indicates an intersection
+								color = payload.getColor();
+							}	
+	
+							// Divide ray payload by number of subpixels and add to total
+							pixelColor = pixelColor.plus(color.divide(totalSubPixels));
+	
+						}
+					}
+	
+					for (int i = 0; i<3; i++) {
+						pixelColor.d[i] = Util.clamp(pixelColor.d[i], 0, 255);
+					}
+	
+					Color tempColor = new Color((int)pixelColor.x(),(int)pixelColor.y(),(int)pixelColor.z());
+	
+					img.setRGB(column, row, tempColor.getRGB());
+	
+				}
+	
+				double percent = ((double)column*100)/((double)windowX);
+				System.out.println(percent + "%");
+	
+			}
+	
+			File outputfile = new File("saved.png");
+			ImageIO.write(img, "png", outputfile);
+	
+			Desktop dt = Desktop.getDesktop();
+			dt.open(outputfile);
+	
+			long endTime = System.currentTimeMillis();
+			long elapsedTime = endTime - startTime;
+	
+			System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
+	
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+	
+	}
+
 	static double CastRay(Ray ray, Payload payload){
 
 		if (payload.getNumBounces() > maxRecursionDepth) { //Return if max depth reached
@@ -131,238 +363,6 @@ public class RayTracer extends JPanel {
 		}
 
 		return 0.0f;
-	}
-	
-	public static void rayTrace(int windowX, int windowY, double fov, int ssColumnMax, int ssRowMax, int maxRecursionDepth, double shadowRayBias, Vector ambientLight, Vector backgroundColor) {
-
-		// Assign parameters to static variables
-		RayTracer.maxRecursionDepth = maxRecursionDepth;
-		RayTracer.shadowRayBias = shadowRayBias;
-		RayTracer.ambientLight = ambientLight;
-
-		long startTime = System.currentTimeMillis();
-
-		// Transforms from world-space to view-space, assigned in scene setup
-		Matrix4 viewMatrix = null;
-		
-		int scene = 3;
-
-		// Switch statement to have multiple scene setups
-		switch(scene) {
-
-		case 0:
-		{
-			AABB aabb = new AABB(Material.TEST_RED, new Vector(0,0,0), new Vector(1,1,1));
-
-			Vector camPos = new Vector(0.5,0.5,3);
-
-			objects.add(aabb);
-			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			viewMatrix = Matrix4.lookAt(camPos, aabb.centre(), new Vector(0,1,0));
-
-			break;
-		}
-
-		case 1:
-		{
-			Sphere s = new Sphere(new Vector(0,0,0), Material.TEST_RED, 1);
-
-			Vector camPos = new Vector(0,0,3);
-			Vector ligPos = new Vector(2,0,3);
-
-			objects.add(s);
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
-
-			break;
-		}
-		case 2:
-		{
-			Vector p0 = new Vector(0,0,0);
-			Vector p1 = new Vector(1,0,0);
-			Vector p2 = p0.plus(new Vector(1,0,1).normalize());
-			Vector p3 = new Vector(p2.x(),Math.sqrt(6)/3f,(p0.z()+p1.z()+p2.z())/3);	
-
-			Vector centre = (p0.plus(p1).plus(p2).plus(p3)).divide(4);
-
-			Triangle t0 = new Triangle(p0,p1,p2, Material.TEST_RED);
-			Triangle t1 = new Triangle(p1,p0,p3, Material.TEST_GREEN);
-			Triangle t2 = new Triangle(p2,p1,p3, Material.TEST_BLUE);
-			Triangle t3 = new Triangle(p0,p2,p3, Material.TEST_YELLOW);
-
-			Vector camPos = new Vector(0,0,3);
-			Vector ligPos = camPos;
-
-			objects.add(t0);
-			objects.add(t1);
-			objects.add(t2);
-			objects.add(t3);
-
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			viewMatrix = Matrix4.lookAt(camPos, centre, new Vector(0,1,0));
-
-			break;
-		}
-
-		case 3:{
-
-			Vector p0 = new Vector(0,0,0);
-			Vector p1 = new Vector(0,1,0);
-			Vector p2 = new Vector(1,0,0);
-
-			Triangle t = new Triangle(p0,p1,p2, Material.TEST_RED);
-
-			Vector camPos = new Vector(0,0,1);
-			Vector ligPos = camPos;
-
-			objects.add(t);
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-			
-			viewMatrix = Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0));
-
-
-			break;
-		}
-
-		}
-
-		//The window aspect ratio
-		double aspectRatio = (double)windowX/(double)windowY;
-		
-		//Value for adjusting the pixel position to account for the field of view
-		double fovAdjust = (double) Math.tan(fov*0.5f *(Math.PI/180.0f));
-
-		// Values used for supersampling anti-aliasing
-		int totalSubPixels = ssColumnMax * ssRowMax;
-
-		double columnMargin = (1f/(2*ssColumnMax));
-		double rowMargin = (1f/(2*ssRowMax));
-
-		try {
-			BufferedImage img = new BufferedImage(windowX, windowY, BufferedImage.TYPE_INT_ARGB);
-
-			for (int column = 0; column < windowX; column++) {
-				for (int row = 0; row < windowY; row++) {
-
-					// Color of pixel, super samples are added to this
-					Vector pixelColor = new Vector(0,0,0);
-
-					for (int ssColumn = 0; ssColumn < ssColumnMax; ssColumn++) {
-						for (int ssRow = 0; ssRow < ssRowMax; ssRow++) {
-
-							//Convert the pixel (Raster space coordinates: (0->ScreenWidth,0->ScreenHeight)) to NDC (Normalised Device Coordinates: (0->1,0->1))
-							double pixelNormX = (column+columnMargin+(ssColumn*2*columnMargin))/windowX; //Add 0.5f to get centre of pixel
-							double pixelNormY = (row+rowMargin+(ssRow*2*rowMargin))/windowY;
-							//Convert from NDC, (0->1,0->1), to Screen space (-1->1,-1->1).  These coordinates correspond to those used by OpenGL
-							//Note coordinate (-1,1) in screen space corresponds to coordinate (0,0) in raster space i.e. column = 0, row = 0
-							double pixelScreenX = 2.0f*pixelNormX - 1.0f;
-							double pixelScreenY = 1.0f-2.0f*pixelNormY;
-
-							//Account for Field of View			
-							double pixelCameraX = pixelScreenX * fovAdjust;
-							double pixelCameraY = pixelScreenY * fovAdjust;
-
-							//Account for image aspect ratio
-							pixelCameraX *= aspectRatio;
-
-							//Put pixel into camera space (offset by 1 unit along camera facing direction i.e. negative z axis)
-							Vector pixelCameraSpace = new Vector(pixelCameraX,pixelCameraY,-1.0,1.0);
-
-							//ray comes from camera origin
-							Vector rayOrigin = new Vector(0.0f,0.0f,0.0f,1.0f);
-
-							//Transform from camera space to world space
-							pixelCameraSpace = viewMatrix.times(pixelCameraSpace);
-							//The origin of the ray we are casting
-							rayOrigin = viewMatrix.times(rayOrigin);
-
-							// Drop 4th dimension for rayOrigin and pixelCameraSpace
-							rayOrigin = rayOrigin.dropDim();
-							pixelCameraSpace = pixelCameraSpace.dropDim();
-
-							//The direction the ray is travelling in
-							Vector rayDirection = pixelCameraSpace.minus(rayOrigin).normalize();
-
-							//Set up ray in world space
-							Ray ray = new Ray(rayOrigin,rayDirection);
-
-							//Structure for storing the information we get from casting the ray
-							Payload payload = new Payload();
-
-							payload.setNumBounces(0);
-
-							Vector color = backgroundColor;
-
-							//Cast our ray into the scene
-							if(CastRay(ray,payload)>0.0){// > 0.0f indicates an intersection
-								color = payload.getColor();
-							}	
-
-							// Divide ray payload by number of subpixels and add to total
-							pixelColor = pixelColor.plus(color.divide(totalSubPixels));
-
-						}
-					}
-
-					for (int i = 0; i<3; i++) {
-						pixelColor.d[i] = Util.clamp(pixelColor.d[i], 0, 255);
-					}
-
-					Color tempColor = new Color((int)pixelColor.x(),(int)pixelColor.y(),(int)pixelColor.z());
-
-					img.setRGB(column, row, tempColor.getRGB());
-
-				}
-
-				double percent = ((double)column*100)/((double)windowX);
-				System.out.println(percent + "%");
-
-			}
-
-			File outputfile = new File("saved.png");
-			ImageIO.write(img, "png", outputfile);
-
-			Desktop dt = Desktop.getDesktop();
-			dt.open(outputfile);
-
-			long endTime = System.currentTimeMillis();
-			long elapsedTime = endTime - startTime;
-
-			System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
-
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	public static void main(String args[]) {
-
-		// Dimensions of image
-		int windowX = 640;
-		int windowY = 480;
-		//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
-		double fov = 90.0f;
-		
-		// Settings for supersampling anti-aliasing
-		int ssColumnMax = 2;
-		int ssRowMax = 2;
-		
-		// Maximum depth that reflection/refraction rays are cast
-		int maxRecursionDepth = 7;
-		// Distance that shadow ray orgins are moved along the surface normal to prevent shadow acne
-		double shadowRayBias = 0.0001; 
-		// The ambient light that is cast on every object
-		Vector ambientLight = new Vector(40f,40f,40f);
-		// The color that is seen when a ray doesn't hit an object;
-		Vector backgroundColor  = new Vector(20f,0f,20f);
-		
-		rayTrace(windowX, windowY, fov, ssColumnMax, ssRowMax, maxRecursionDepth, shadowRayBias, ambientLight, backgroundColor);
-
 	}
 
 }
