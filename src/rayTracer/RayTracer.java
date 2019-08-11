@@ -13,11 +13,10 @@ import javax.swing.JPanel;
 
 public class RayTracer extends JPanel {
 
+	// Static variables used in CastRay
 	static int maxRecursionDepth;	
 	static double shadowRayBias;
 	static Vector ambientLight;
-	static Vector backgroundColor;
-	static Vector cameraPosition;
 	//Structure containing all scene objects
 	static ArrayList<MatObject> objects = new ArrayList<MatObject>();
 	static ArrayList<Light> lights = new ArrayList<Light>();
@@ -140,7 +139,6 @@ public class RayTracer extends JPanel {
 		RayTracer.maxRecursionDepth = maxRecursionDepth;
 		RayTracer.shadowRayBias = shadowRayBias;
 		RayTracer.ambientLight = ambientLight;
-		RayTracer.backgroundColor = backgroundColor;
 
 		long startTime = System.currentTimeMillis();
 
@@ -161,8 +159,7 @@ public class RayTracer extends JPanel {
 			objects.add(aabb);
 			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			cameraPosition = camPos;
-			viewMatrix = Matrix4.lookAt(cameraPosition, aabb.centre(), new Vector(0,1,0));
+			viewMatrix = Matrix4.lookAt(camPos, aabb.centre(), new Vector(0,1,0));
 
 			break;
 		}
@@ -177,8 +174,7 @@ public class RayTracer extends JPanel {
 			objects.add(s);
 			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			cameraPosition = camPos;
-			viewMatrix = Matrix4.lookAt(cameraPosition, s.Position(), new Vector(0,1,0));
+			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
 
 			break;
 		}
@@ -206,8 +202,7 @@ public class RayTracer extends JPanel {
 
 			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			cameraPosition = camPos;
-			viewMatrix = Matrix4.lookAt(cameraPosition, centre, new Vector(0,1,0));
+			viewMatrix = Matrix4.lookAt(camPos, centre, new Vector(0,1,0));
 
 			break;
 		}
@@ -225,9 +220,8 @@ public class RayTracer extends JPanel {
 
 			objects.add(t);
 			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			cameraPosition = camPos;
-			viewMatrix = Matrix4.lookAt(cameraPosition, t.centre(), new Vector(0,1,0));
+			
+			viewMatrix = Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0));
 
 
 			break;
