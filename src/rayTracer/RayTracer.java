@@ -142,7 +142,6 @@ public class RayTracer extends JPanel {
 
 			viewMatrix = Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0));
 
-
 			break;
 		}
 
@@ -160,6 +159,8 @@ public class RayTracer extends JPanel {
 			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
 			viewMatrix = Matrix4.lookAt(camPos, p0, new Vector(0,1,0));
+			
+			break;
 		}
 
 		case 5:{
@@ -180,7 +181,8 @@ public class RayTracer extends JPanel {
 			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
 			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
-
+			
+			break;
 		}
 
 		case 6:{
@@ -201,7 +203,8 @@ public class RayTracer extends JPanel {
 			objects.add(s);
 			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
-
+			
+			break;
 		}
 
 		}
