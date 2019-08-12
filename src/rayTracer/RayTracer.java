@@ -13,61 +13,33 @@ import javax.swing.JPanel;
 
 public class RayTracer extends JPanel {
 
-	// Static variables used in CastRay
-	static int maxRecursionDepth;	
-	static double shadowRayBias;
-	static Vector ambientLight;
-	//Structure containing all scene objects
-	static ArrayList<MatObject> objects = new ArrayList<MatObject>();
-	static ArrayList<Light> lights = new ArrayList<Light>();
-
-	//Recursive ray-casting function
-	//Called for each pixel and each time a ray is reflected/used for shadow testing
-	//@ray The ray we are casting
-	//@payload Information on the current ray i.e. the cumulative color and the number of bounces it has performed
-	//returns either the time of intersection with an object (the coefficient t in the equation: RayPosition = RayOrigin + t*RayDirection) or zero to indicate no intersection
-
 	public static void main(String args[]) {
 
+		Settings settings = new Settings();
+		
 		// Dimensions of image
-		int windowX = 640;
-		int windowY = 480;
+		settings.setWindowXY(640,480);
 		//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
-		double fov = 90.0f;
+		settings.setFov(90f);
 
 		// Settings for supersampling anti-aliasing
-		int ssColumnMax = 1;
-		int ssRowMax = 1;
+		settings.setSSColRowMax(1,1);
 
 		// Maximum depth that reflection/refraction rays are cast
-		int maxRecursionDepth = 7;
+		settings.setMaxRecursionDepth(7);
 		// Distance that shadow ray orgins are moved along the surface normal to prevent shadow acne
-		double shadowRayBias = 0.0001; 
+		settings.setShadowRayBias(0.0001);		
+		
+		Scene scene = new Scene();
+		
 		// The ambient light that is cast on every object
-		Vector ambientLight = new Vector(40f,40f,40f);
+		scene.setAmbientLight(new Vector(40f,40f,40f));
 		// The color that is seen when a ray doesn't hit an object;
-		Vector backgroundColor  = new Vector(20f,0f,20f);
-
-		rayTrace(windowX, windowY, fov, ssColumnMax, ssRowMax, maxRecursionDepth, shadowRayBias, ambientLight, backgroundColor);
-
-	}
-
-	public static void rayTrace(int windowX, int windowY, double fov, int ssColumnMax, int ssRowMax, int maxRecursionDepth, double shadowRayBias, Vector ambientLight, Vector backgroundColor) {
-
-		// Assign parameters to static variables
-		RayTracer.maxRecursionDepth = maxRecursionDepth;
-		RayTracer.shadowRayBias = shadowRayBias;
-		RayTracer.ambientLight = ambientLight;
-
-		long startTime = System.currentTimeMillis();
-
-		// Transforms from world-space to view-space, assigned in scene setup
-		Matrix4 viewMatrix = null;
-
-		int scene = 6;
+		scene.setBackgroundColor(new Vector(20f,0f,20f));;
 
 		// Switch statement to have multiple scene setups
-		switch(scene) {
+		int sceneNum = 6;
+		switch(sceneNum) {
 
 		case 0:
 		{
@@ -75,10 +47,10 @@ public class RayTracer extends JPanel {
 
 			Vector camPos = new Vector(0.5,0.5,3);
 
-			objects.add(aabb);
-			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.addObject(aabb);
+			scene.addLight(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			viewMatrix = Matrix4.lookAt(camPos, aabb.centre(), new Vector(0,1,0));
+			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.centre(), new Vector(0,1,0)));
 
 			break;
 		}
@@ -90,10 +62,10 @@ public class RayTracer extends JPanel {
 			Vector camPos = new Vector(0,0,3);
 			Vector ligPos = new Vector(2,0,3);
 
-			objects.add(s);
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.addObject(s);
+			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
+			scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
 
 			break;
 		}
@@ -114,14 +86,14 @@ public class RayTracer extends JPanel {
 			Vector camPos = new Vector(0,0,3);
 			Vector ligPos = camPos;
 
-			objects.add(t0);
-			objects.add(t1);
-			objects.add(t2);
-			objects.add(t3);
+			scene.addObject(t0);
+			scene.addObject(t1);
+			scene.addObject(t2);
+			scene.addObject(t3);
 
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			viewMatrix = Matrix4.lookAt(camPos, centre, new Vector(0,1,0));
+			scene.setViewMatrix(Matrix4.lookAt(camPos, centre, new Vector(0,1,0)));
 
 			break;
 		}
@@ -137,10 +109,10 @@ public class RayTracer extends JPanel {
 			Vector camPos = new Vector(0,0,1);
 			Vector ligPos = camPos;
 
-			objects.add(t);
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.addObject(t);
+			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			viewMatrix = Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0));
+			scene.setViewMatrix(Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0)));
 
 			break;
 		}
@@ -155,12 +127,10 @@ public class RayTracer extends JPanel {
 			Vector camPos = new Vector(0,0,5);
 			Vector ligPos = camPos;
 
-			objects.add(d);
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.addObject(d);
+			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			viewMatrix = Matrix4.lookAt(camPos, p0, new Vector(0,1,0));
-			
-			break;
+			scene.setViewMatrix(Matrix4.lookAt(camPos, p0, new Vector(0,1,0)));
 		}
 
 		case 5:{
@@ -174,15 +144,14 @@ public class RayTracer extends JPanel {
 			Vector camPos = new Vector(1,1,4);
 			Vector ligPos = new Vector(0,5,0);
 
-			objects.add(p0);
-			objects.add(p1);
-			objects.add(p2);
-			objects.add(s);
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.addObject(p0);
+			scene.addObject(p1);
+			scene.addObject(p2);
+			scene.addObject(s);
+			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
-			
-			break;
+			scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
+
 		}
 
 		case 6:{
@@ -200,53 +169,53 @@ public class RayTracer extends JPanel {
 			Vector camPos = new Vector(4,4,4);
 			Vector ligPos = new Vector(0,0,4);
 
-			objects.add(s);
-			lights.add(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-			viewMatrix = Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0));
-			
-			break;
-		}
+			scene.addObject(s);
+			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
 
 		}
 
-		//The window aspect ratio
-		double aspectRatio = (double)windowX/(double)windowY;
+		}
 
-		//Value for adjusting the pixel position to account for the field of view
-		double fovAdjust = (double) Math.tan(fov*0.5f *(Math.PI/180.0f));
+		long startTime = System.currentTimeMillis();
+		
+		rayTrace(settings, scene);
 
-		// Values used for supersampling anti-aliasing
-		int totalSubPixels = ssColumnMax * ssRowMax;
+		long endTime = System.currentTimeMillis();
+		long elapsedTime = endTime - startTime;
 
-		double columnMargin = (1f/(2*ssColumnMax));
-		double rowMargin = (1f/(2*ssRowMax));
+		System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
+		
+	}
+
+	public static void rayTrace(Settings settings, Scene scene) {
 
 		try {
-			BufferedImage img = new BufferedImage(windowX, windowY, BufferedImage.TYPE_INT_ARGB);
+			BufferedImage img = new BufferedImage(settings.getWindowX(), settings.getWindowY(), BufferedImage.TYPE_INT_ARGB);
 
-			for (int column = 0; column < windowX; column++) {
-				for (int row = 0; row < windowY; row++) {
+			for (int column = 0; column < settings.getWindowX(); column++) {
+				for (int row = 0; row < settings.getWindowY(); row++) {
 
 					// Color of pixel, super samples are added to this
 					Vector pixelColor = new Vector(0,0,0);
 
-					for (int ssColumn = 0; ssColumn < ssColumnMax; ssColumn++) {
-						for (int ssRow = 0; ssRow < ssRowMax; ssRow++) {
+					for (int ssColumn = 0; ssColumn < settings.getSSColumnMax(); ssColumn++) {
+						for (int ssRow = 0; ssRow < settings.getSSRowMax(); ssRow++) {
 
 							//Convert the pixel (Raster space coordinates: (0->ScreenWidth,0->ScreenHeight)) to NDC (Normalised Device Coordinates: (0->1,0->1))
-							double pixelNormX = (column+columnMargin+(ssColumn*2*columnMargin))/windowX; //Add 0.5f to get centre of pixel
-							double pixelNormY = (row+rowMargin+(ssRow*2*rowMargin))/windowY;
+							double pixelNormX = (column+settings.getColumnMargin()+(ssColumn*2*settings.getColumnMargin()))/settings.getWindowX(); //Add 0.5f to get centre of pixel
+							double pixelNormY = (row+settings.getRowMargin()+(ssRow*2*settings.getRowMargin()))/settings.getWindowY();
 							//Convert from NDC, (0->1,0->1), to Screen space (-1->1,-1->1).  These coordinates correspond to those used by OpenGL
 							//Note coordinate (-1,1) in screen space corresponds to coordinate (0,0) in raster space i.e. column = 0, row = 0
 							double pixelScreenX = 2.0f*pixelNormX - 1.0f;
 							double pixelScreenY = 1.0f-2.0f*pixelNormY;
 
 							//Account for Field of View			
-							double pixelCameraX = pixelScreenX * fovAdjust;
-							double pixelCameraY = pixelScreenY * fovAdjust;
+							double pixelCameraX = pixelScreenX * settings.getFovAdjust();
+							double pixelCameraY = pixelScreenY * settings.getFovAdjust();
 
 							//Account for image aspect ratio
-							pixelCameraX *= aspectRatio;
+							pixelCameraX *= settings.getAspectRatio();
 
 							//Put pixel into camera space (offset by 1 unit along camera facing direction i.e. negative z axis)
 							Vector pixelCameraSpace = new Vector(pixelCameraX,pixelCameraY,-1.0,1.0);
@@ -255,9 +224,9 @@ public class RayTracer extends JPanel {
 							Vector rayOrigin = new Vector(0.0f,0.0f,0.0f,1.0f);
 
 							//Transform from camera space to world space
-							pixelCameraSpace = viewMatrix.times(pixelCameraSpace);
+							pixelCameraSpace = scene.getViewMatrix().times(pixelCameraSpace);
 							//The origin of the ray we are casting
-							rayOrigin = viewMatrix.times(rayOrigin);
+							rayOrigin = scene.getViewMatrix().times(rayOrigin);
 
 							// Drop 4th dimension for rayOrigin and pixelCameraSpace
 							rayOrigin = rayOrigin.dropDim();
@@ -274,15 +243,15 @@ public class RayTracer extends JPanel {
 
 							payload.setNumBounces(0);
 
-							Vector color = backgroundColor;
+							Vector color = scene.getBackgroundColor();
 
 							//Cast our ray into the scene
-							if(CastRay(ray,payload)>0.0){// > 0.0f indicates an intersection
+							if(CastRay(ray, payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 								color = payload.getColor();
 							}	
 
 							// Divide ray payload by number of subpixels and add to total
-							pixelColor = pixelColor.plus(color.divide(totalSubPixels));
+							pixelColor = pixelColor.plus(color.divide(settings.getTotalSubPixels()));
 
 						}
 					}
@@ -297,7 +266,7 @@ public class RayTracer extends JPanel {
 
 				}
 
-				double percent = ((double)column*100)/((double)windowX);
+				double percent = ((double)column*100)/((double)settings.getWindowX());
 				System.out.println(percent + "%");
 
 			}
@@ -308,11 +277,6 @@ public class RayTracer extends JPanel {
 			Desktop dt = Desktop.getDesktop();
 			dt.open(outputfile);
 
-			long endTime = System.currentTimeMillis();
-			long elapsedTime = endTime - startTime;
-
-			System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
-
 		}
 		catch (IOException e) {
 			e.printStackTrace();
@@ -320,9 +284,14 @@ public class RayTracer extends JPanel {
 
 	}
 
-	static double CastRay(Ray ray, Payload payload){
+	//Recursive ray-casting function
+	//Called for each pixel and each time a ray is reflected/used for shadow testing
+	//@ray The ray we are casting
+	//@payload Information on the current ray i.e. the cumulative color and the number of bounces it has performed
+	//returns either the time of intersection with an object (the coefficient t in the equation: RayPosition = RayOrigin + t*RayDirection) or zero to indicate no intersection
+	static double CastRay(Ray ray, Payload payload, Settings settings, Scene scene){
 
-		if (payload.getNumBounces() > maxRecursionDepth) { //Return if max depth reached
+		if (payload.getNumBounces() > settings.getMaxRecursionDepth()) { //Return if max depth reached
 			return 0f;
 		}
 
@@ -333,7 +302,7 @@ public class RayTracer extends JPanel {
 		boolean hit = false;
 
 		// Sets info to the intersection info of nearest intersection
-		for (MatObject o : objects) {
+		for (MatObject o : scene.getObjects()) {
 			boolean intersect = o.Intersect(ray, info);
 			hit = hit | intersect;
 		}
@@ -345,19 +314,19 @@ public class RayTracer extends JPanel {
 			Vector illumination = new Vector(0,0,0);
 
 			if (info.getObject().hasTextureMap) {
-				
+
 				MatObject o = info.getObject();
 				BufferedImage bI = ((Sphere)o).texture;
-				
+
 				double u = o.u(info.getHitPoint());
 				double v = o.v(info.getHitPoint());
-				
+
 				int iU = (int) (u * bI.getWidth());
 				int iV = (int) (v * bI.getHeight());
-				
+
 				int rgb = info.getObject().texture.getRGB(iU, iV);
 				Color c = new Color(rgb);
-				
+
 				payload.setColor(new Vector(c.getRed(),c.getGreen(),c.getBlue()));
 				return info.getTime();
 			}
@@ -365,7 +334,7 @@ public class RayTracer extends JPanel {
 			else {
 
 				if (info.getMaterial().isAmbient) {
-					Vector ambient = ambientLight.multComponents(info.getMaterial().ambient);
+					Vector ambient = scene.getAmbientLight().multComponents(info.getMaterial().ambient);
 					illumination = illumination.plus(ambient);
 				}
 
@@ -373,16 +342,16 @@ public class RayTracer extends JPanel {
 				// Diffuse and specular illumination
 				if (info.getMaterial().isDiffuse || info.getMaterial().isSpecular) {
 
-					for (Light l: lights) {
+					for (Light l: scene.getLights()) {
 
 						Vector objectToLight = l.Position().minus(info.getHitPoint());
 						double timeToLight = objectToLight.length();
 						objectToLight = objectToLight.normalize();
-						Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().times(shadowRayBias)), objectToLight);
+						Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().times(settings.getShadowRayBias())), objectToLight);
 						IntersectInfo shadowRayInfo = new IntersectInfo();
 						shadowRayInfo.setTime(Double.POSITIVE_INFINITY);
 
-						for (MatObject obj : objects) {
+						for (MatObject obj : scene.getObjects()) {
 							obj.Intersect(shadowRay, shadowRayInfo); // shadowRayInfo becomes info of nearest intersection, if any
 						}
 
@@ -440,7 +409,7 @@ public class RayTracer extends JPanel {
 					reflectionPayload.setNumBounces(payload.numBounces+1);
 
 					// Reflection ray is cast 
-					CastRay(reflectionRay, reflectionPayload);
+					CastRay(reflectionRay, reflectionPayload, settings, scene);
 
 					reflection = reflectionPayload.Color.times(info.getMaterial().reflectionCoefficient);
 
