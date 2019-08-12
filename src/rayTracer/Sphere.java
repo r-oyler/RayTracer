@@ -1,5 +1,7 @@
 package rayTracer;
 
+import java.io.File;
+
 // A sphere, defined by a centre point and radius
 public class Sphere extends MatObject {
 	
@@ -14,7 +16,7 @@ public class Sphere extends MatObject {
 		count++;
 		this.name = "Sphere " + count;
 	}
-
+	
 	@Override
 	boolean Intersect(Ray ray, IntersectInfo info) {
 		
@@ -56,6 +58,7 @@ public class Sphere extends MatObject {
             info.setHitPoint(ray.atTime(time));
             info.setNormal(info.getHitPoint().minus(this.Position()).normalize());
             info.setMaterial(this.material);
+            info.setObject(this);
             info.setObjectName(this.name);
         }
         
@@ -77,6 +80,26 @@ public class Sphere extends MatObject {
 		double centreDistance = this.Position().minus(s.Position()).length();
 		
 		return (centreDistance-radiusSum);
+		
+	}
+	
+	public double u(Vector hitPoint) {
+		
+		Vector hitPointToCentre = (this.Position().minus(hitPoint)).normalize();
+		
+		double u = 0.5 + Math.atan2(hitPointToCentre.z(), hitPointToCentre.x())/(2*Math.PI);
+		
+		return 1-u;
+		
+	}
+	
+	public double v(Vector hitPoint) {
+		
+		Vector hitPointToCentre = (this.Position().minus(hitPoint)).normalize();
+		
+		double v = 0.5 - Math.asin(hitPointToCentre.y())/Math.PI;
+		
+		return 1-v;
 		
 	}
 	

@@ -1,5 +1,8 @@
 package rayTracer;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
+
 // Object that does not have a material
 public abstract class Object {
 
@@ -22,12 +25,23 @@ abstract class MatObject extends Object {
 
 	//The material properties of the object
 	Material material;
+	
+	boolean hasTextureMap = false;
+	BufferedImage texture = null;
 
 	MatObject(Vector p, Material m){
 		super(p);
 		this.material = m;
 	}
 
+	public void addTextureMap(BufferedImage bI) {
+		hasTextureMap = true;
+		texture = bI;
+	}
+	
+	abstract double u(Vector hitPoint);
+	abstract double v(Vector hitPoint);
+	
 	//Test whether a ray intersects the object
 	//@ray The ray that we are testing for intersection
 	//@info Object containing information on the intersection between the ray and the object(if any)

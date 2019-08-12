@@ -49,6 +49,8 @@ class IntersectInfo{
 	//The material of the object that was intersected
 	Material material;
 	
+	MatObject object;
+	
 	String objectName;
 	
 	public double getTime() {
@@ -74,6 +76,12 @@ class IntersectInfo{
 	}
 	public void setMaterial(Material material) {
 		this.material = material;
+	}
+	public MatObject getObject() {
+		return this.object;
+	}
+	public void setObject(MatObject object) {
+		this.object = object;
 	}
 	public String getObjectName() {
 		return objectName;
