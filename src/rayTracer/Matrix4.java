@@ -1,6 +1,6 @@
 package rayTracer;
 
-public class Matrix4{
+public class Matrix4 {
 
 	double d[][] = new double[4][4];
 
@@ -151,4 +151,8 @@ public class Matrix4{
 
 	}
 
+	public Matrix4 clone() {
+		return new Matrix4(this.d);
+	}
+	
 }

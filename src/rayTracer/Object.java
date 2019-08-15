@@ -57,9 +57,11 @@ abstract class MatObject extends Object {
 		return "Object [name=" + name + "]";
 	}
 
+	abstract public MatObject clone();
+	
 }
 
-class Material{
+class Material {
 
 	//Material values used for lighting equations
 	boolean isAmbient = false;
@@ -150,6 +152,18 @@ class Material{
 		return "Material [name=" + name + "]";
 	}
 
+	public Material clone() {
+		
+		Material clone = new Material(this.name);
+		if (isAmbient) clone.setAmbient(this.ambient);
+		if (isDiffuse) clone.setDiffuse(this.diffuse);
+		if (isSpecular) clone.setSpecular(this.specular, this.specularExponent);
+		if (isReflective) clone.setReflective(this.reflectionCoefficient);
+		
+		return clone;
+		
+	}
+	
 	//TODO add further material values here such as refraction index
 
 }

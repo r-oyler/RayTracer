@@ -4,8 +4,6 @@ package rayTracer;
 // Source: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 public class AABB extends MatObject {
 
-	static int normals = 0;
-
 	Vector[] bounds = new Vector[2];
 
 	AABB(Material m, Vector vMin, Vector vMax) {
@@ -72,13 +70,10 @@ public class AABB extends MatObject {
 			info.setHitPoint(hitPoint);
 
 			Vector normal = calcNormal(hitPoint);
-						
-			if (normal.x() == 0f && normal.y() == 0f && normal.z() == 1f) {
-				normals++;
-			}
 			
 			info.setNormal(normal);
 			info.setMaterial(this.material);
+			info.setObject(this);
 			info.setObjectName(this.name);
 		}
 
@@ -135,6 +130,11 @@ public class AABB extends MatObject {
 	double v(Vector hitPoint) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	@Override
+	public AABB clone() {
+		return new AABB(material.clone(), this.bounds[0].clone(), this.bounds[1].clone());
 	}
 
 }

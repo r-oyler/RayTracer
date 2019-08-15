@@ -50,6 +50,7 @@ public class Plane extends MatObject {
 			info.setHitPoint(ray.atTime(time));
 			info.setNormal(this.normal);
 			info.setMaterial(this.material);
+			info.setObject(this);
 			info.setObjectName(this.name);
 		}
 
@@ -78,6 +79,11 @@ public class Plane extends MatObject {
 	double v(Vector hitPoint) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public MatObject clone() {
+		return new Plane(this.p0.clone(),this.material.clone(),this.normal.clone());
 	}
 	
 }

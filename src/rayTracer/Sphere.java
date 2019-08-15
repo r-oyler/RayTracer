@@ -1,7 +1,5 @@
 package rayTracer;
 
-import java.io.File;
-
 // A sphere, defined by a centre point and radius
 public class Sphere extends MatObject {
 	
@@ -101,6 +99,11 @@ public class Sphere extends MatObject {
 		
 		return 1-v;
 		
+	}
+
+	@Override
+	public MatObject clone() {
+		return new Sphere(this.p0.clone(),this.material.clone(),this.radius);
 	}
 	
 }

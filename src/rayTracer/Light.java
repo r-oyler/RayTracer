@@ -22,5 +22,9 @@ public class Light extends Object{
 	public static Vector randomColor() {
 		return new Vector(Math.random()*255,Math.random()*255,Math.random()*255);
 	}
+
+	public Light clone() {
+		return new Light(this.p0.clone(),this.color.clone());
+	}
 	
 }

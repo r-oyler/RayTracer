@@ -127,6 +127,7 @@ public class Triangle extends MatObject {
 			info.setHitPoint(ray.atTime(time));
 			info.setNormal(this.normal);
 			info.setMaterial(this.material);
+			info.setObject(this);
 			info.setObjectName(this.name);
 			
 		}
@@ -150,6 +151,11 @@ public class Triangle extends MatObject {
 	double v(Vector hitPoint) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public MatObject clone() {
+		return new Triangle(this.p0.clone(), this.p1.clone(), this.p2.clone(), this.material.clone());
 	}
 
 }

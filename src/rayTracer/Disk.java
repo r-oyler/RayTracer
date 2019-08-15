@@ -36,6 +36,7 @@ public class Disk extends MatObject {
 				info.setHitPoint(ray.atTime(planeInfo.time));
 				info.setNormal(this.normal);
 				info.setMaterial(this.material);
+				info.setObject(this);
 				info.setObjectName(this.name);
 			}
 
@@ -56,6 +57,11 @@ public class Disk extends MatObject {
 	double v(Vector hitPoint) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public Disk clone() {
+		return new Disk(this.p0.clone(),this.material.clone(),this.normal.clone(),this.radius);
 	}
 
 }
