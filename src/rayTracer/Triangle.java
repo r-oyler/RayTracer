@@ -2,6 +2,9 @@ package rayTracer;
 
 public class Triangle extends MatObject {
 
+	// Used for naming object
+	static int count = 0;
+	
 	// Points 1 and 2, point 0 is in Object
 	Vector p1;
 	Vector p2;
@@ -19,6 +22,10 @@ public class Triangle extends MatObject {
 		Vector v2 = p2.minus(p0);
 		// Normal is perpendicular to two vectors on plane
 		this.normal = v2.crossProduct(v1);
+		
+		count++;
+		this.name = "Triangle " + count;
+		
 	}
 	
 	// Specify points anti-clockwise

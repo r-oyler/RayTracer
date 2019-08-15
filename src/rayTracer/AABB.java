@@ -4,6 +4,9 @@ package rayTracer;
 // Source: https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-box-intersection
 public class AABB extends MatObject {
 
+	// Used for naming object
+	static int count = 0;
+	
 	Vector[] bounds = new Vector[2];
 
 	AABB(Material m, Vector vMin, Vector vMax) {
@@ -19,6 +22,9 @@ public class AABB extends MatObject {
 
 		this.bounds[0] = vMin;
 		this.bounds[1] = vMax;
+		
+		count++;
+		this.name = "AABB " + count;
 	}
 
 	@Override

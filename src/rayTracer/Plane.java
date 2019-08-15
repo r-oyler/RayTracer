@@ -4,7 +4,7 @@ package rayTracer;
 public class Plane extends MatObject {
 
 	// Used for naming object
-	static int count;
+	static int count = 0;
 	
 	Vector normal;
 
