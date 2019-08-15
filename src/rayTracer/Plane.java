@@ -63,7 +63,7 @@ public class Plane extends MatObject {
 		
 		Vector planeOriginToPoint = p.minus(this.Position());
 		
-		Vector planeToPoint = this.normal.times(planeOriginToPoint.dotProduct(this.normal));
+		Vector planeToPoint = this.normal.timesConst(planeOriginToPoint.dotProduct(this.normal));
 		
 		return planeToPoint.length();
 		

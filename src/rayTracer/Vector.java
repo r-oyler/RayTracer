@@ -47,7 +47,7 @@ public class Vector {
 
 	}
 
-	Vector times(double s) {
+	Vector timesConst(double s) {
 
 		double[] prod = new double[dim];
 
@@ -64,6 +64,17 @@ public class Vector {
 
 		for(int i = 0; i<dim; i++) {
 			quot[i] = d[i]/s;
+		}
+
+		return new Vector(quot);
+	}
+	
+	Vector inverseDivide(double s) {
+
+		double[] quot = new double[dim];
+
+		for(int i = 0; i<dim; i++) {
+			quot[i] = s/d[i];
 		}
 
 		return new Vector(quot);
@@ -120,10 +131,6 @@ public class Vector {
 
 	}
 
-	Vector negative() {
-		return this.times(-1);
-	}
-
 	double length() {
 
 		double len = 0;
@@ -150,10 +157,22 @@ public class Vector {
 
 	Vector normalize() {
 
-		return this.times(1.0/this.length());
+		return this.timesConst(1.0/this.length());
 
 	}
 
+	Vector absolute() {
+		
+		double[] abs = new double[this.dim];
+
+		for (int i = 0; i<dim; i++) {
+			abs[i] = Math.abs(this.d[i]);
+		}
+
+		return new Vector(abs);
+		
+	}
+	
 	// Source: https://rosettacode.org/wiki/Vector_products#Java
 	Vector crossProduct(Vector v) {
 
@@ -168,7 +187,7 @@ public class Vector {
 	}
 
 	// Add dimension to vector, new dimension is given 0
-	Vector addDim() {
+	Vector addDim(double x) {
 
 		double[] d = new double[this.dim+1];
 
@@ -176,7 +195,7 @@ public class Vector {
 			d[i] = this.d[i];
 		}
 
-		d[d.length-1] = 0;
+		d[d.length-1] = x;
 
 		return new Vector(d);
 	}
@@ -202,18 +221,28 @@ public class Vector {
 
 		for (int i = 0; i<dim; i++) {
 
-			if (this.d[i] >= 0) {
-				sign[i] = 1;
-			}
-			else {
-				sign[i] = -1;
-			}
+			sign[i] = Util.sign(this.d[i]);
+			
 		}
 
 		return new Vector(sign);
 
 	}
 
+	public Vector step(Vector edge) {
+		
+		double[] step = new double[this.dim];
+
+		for (int i = 0; i<dim; i++) {
+
+			step[i] = Util.step(edge.d[i], this.d[i]);
+			
+		}
+
+		return new Vector(step);
+		
+	}
+	
 	public double x() {
 		return this.d[0];
 	}

@@ -80,4 +80,35 @@ public class Util {
 		
 	}
 
+	public static double sign(double d) {
+		
+		if (d < 0) {
+			return -1;
+		}
+		else if (d > 0) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+		
+	}
+	
+	public static double step(double edge, double d) {
+		
+		if (d < edge) {
+			return 0.0;
+		}
+		else {
+			return 1.0;
+		}
+		
+	}
+	
+	public static double degreeToRadian(double degrees) {
+		
+		return degrees * Math.PI/180.0;
+		
+	}
+	
 }

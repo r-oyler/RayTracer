@@ -18,6 +18,26 @@ public abstract class Object {
 		transform = Matrix4.translationMatrix(p);
 	}
 	
+	public void rotateX(double theta) {
+		this.transform = transform.times(Matrix4.xRotationMatrix(theta));
+	}
+	
+	public void rotateY(double theta) {
+		this.transform = transform.times(Matrix4.yRotationMatrix(theta));
+	}
+	
+	public void rotateZ(double theta) {
+		this.transform = transform.times(Matrix4.zRotationMatrix(theta));
+	}
+	
+	public void scale(double xScale, double yScale, double zScale) {
+		this.transform = transform.times(Matrix4.scaleMatrix(xScale, yScale, zScale));
+	}
+	
+	public void translate(double xDist, double yDist, double zDist) {
+		this.transform = transform.times(Matrix4.translationMatrix(xDist, yDist, zDist));
+	}
+	
 }
 
 // Object that does have a material

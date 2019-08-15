@@ -14,19 +14,19 @@ public class RayTracer {
 	private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 
 	public static void main(String args[]) throws Exception {
-
+				
 		// Toggle for using multi-threading
-		boolean multiThreading = true;
+		boolean multiThreading = false;
 		
 		Settings settings = new Settings();
 
 		// Dimensions of image
-		settings.setWindowXY(640*4,480*4);
+		settings.setWindowXY(640,480);
 		//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
 		settings.setFov(90f);
 
 		// Settings for supersampling anti-aliasing
-		settings.setSSColRowMax(3,3);
+		settings.setSSColRowMax(1,1);
 
 		// Maximum depth that reflection/refraction rays are cast
 		settings.setMaxRecursionDepth(7);
@@ -41,19 +41,19 @@ public class RayTracer {
 		scene.setBackgroundColor(new Vector(20f,0f,20f));;
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = 5;
+		int sceneNum = 7;
 		switch(sceneNum) {
 
 		case 0:
 		{
-			AABB aabb = new AABB(Material.RED, new Vector(0,0,0), new Vector(1,1,1));
+			AABB aabb = new AABB(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
 
 			Vector camPos = new Vector(0.5,0.5,3);
 
 			scene.addObject(aabb);
 			scene.addLight(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
 
-			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.centre(), new Vector(0,1,0)));
+			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
 
 			break;
 		}
@@ -179,6 +179,42 @@ public class RayTracer {
 			break;
 		}
 
+		case 7:{
+			
+			AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
+			AABB aabb2 = new AABB(new Vector(5,1,1), Material.BLUE, new Vector(1,1,1));
+			AABB aabb3 = new AABB(new Vector(1,5,1), Material.YELLOW, new Vector(1,1,1));
+			AABB aabb4 = new AABB(new Vector(1,1,5), Material.GREEN, new Vector(1,1,1));
+			
+			Vector camPos = new Vector(8,8,8);
+			Vector lightPos = camPos;
+
+			scene.addObject(aabb);
+			scene.addObject(aabb2);
+			scene.addObject(aabb3);
+			scene.addObject(aabb4);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
+			
+			break;
+		}
+		
+		case 8:{
+			
+			AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
+			
+			Vector camPos = new Vector(8,8,8);
+			Vector lightPos = camPos;
+
+			scene.addObject(aabb);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
+			
+			break;
+		}
+		
 		}
 
 		long startTime = System.currentTimeMillis();
@@ -270,9 +306,9 @@ public class RayTracer {
 						Vector rayOrigin = new Vector(0.0f,0.0f,0.0f,1.0f);
 
 						//Transform from camera space to world space
-						pixelCameraSpace = scene.getViewMatrix().times(pixelCameraSpace);
+						pixelCameraSpace = scene.getViewMatrix().timesV(pixelCameraSpace);
 						//The origin of the ray we are casting
-						rayOrigin = scene.getViewMatrix().times(rayOrigin);
+						rayOrigin = scene.getViewMatrix().timesV(rayOrigin);
 
 						// Drop 4th dimension for rayOrigin and pixelCameraSpace
 						rayOrigin = rayOrigin.dropDim();
@@ -290,8 +326,11 @@ public class RayTracer {
 						payload.setNumBounces(0);
 
 						Vector color = scene.getBackgroundColor();
-
-
+						
+						if (column == 320 && row == 240) {
+							System.out.println();
+						}
+						
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
@@ -312,8 +351,8 @@ public class RayTracer {
 
 			}
 
-			//double percent = ((double)column*100)/((double)settings.getWindowX());
-			//System.out.println(percent + "%");
+//			double percent = ((double)column*100)/((double)settings.getWindowX());
+//			System.out.println(percent + "%");
 
 		}
 
@@ -382,7 +421,7 @@ public class RayTracer {
 						Vector objectToLight = l.Position().minus(info.getHitPoint());
 						double timeToLight = objectToLight.length();
 						objectToLight = objectToLight.normalize();
-						Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().times(settings.getShadowRayBias())), objectToLight);
+						Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getShadowRayBias())), objectToLight);
 						IntersectInfo shadowRayInfo = new IntersectInfo();
 						shadowRayInfo.setTime(Double.POSITIVE_INFINITY);
 
@@ -403,7 +442,7 @@ public class RayTracer {
 								}
 
 								cosTheta = Math.max(0, cosTheta);
-								Vector diffuse = l.getColor().multComponents(info.getMaterial().diffuse).times(cosTheta);
+								Vector diffuse = l.getColor().multComponents(info.getMaterial().diffuse).timesConst(cosTheta);
 
 								illumination = illumination.plus(diffuse);
 							}
@@ -411,16 +450,16 @@ public class RayTracer {
 							if (info.getMaterial().isSpecular) {
 								// Specular illumination
 
-								Vector objectToCamera = ray.direction.times(-1).normalize(); // objectToCamera is the reverse of the original camera ray
+								Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
 
 								Vector normal = info.getNormal();
-								Vector reflection = info.getNormal().times(2).times(normal.dotProduct(objectToLight)).minus(objectToLight);
+								Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToLight)).minus(objectToLight);
 
 								double cosAngle = reflection.cosAngleBetween(objectToCamera);
 								cosAngle = Math.max(0, cosAngle);
 								cosAngle = Math.pow(cosAngle, info.getMaterial().specularExponent);
 
-								Vector specular = l.getColor().multComponents(info.getMaterial().specular).times(cosAngle);
+								Vector specular = l.getColor().multComponents(info.getMaterial().specular).timesConst(cosAngle);
 
 								illumination = illumination.plus(specular);
 
@@ -433,10 +472,10 @@ public class RayTracer {
 
 				if (info.getMaterial().isReflective) {
 
-					Vector objectToCamera = ray.direction.times(-1).normalize(); // objectToCamera is the reverse of the original camera ray
+					Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
 
 					Vector normal = info.getNormal();
-					Vector reflection = info.getNormal().times(2).times(normal.dotProduct(objectToCamera)).minus(objectToCamera);
+					Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToCamera)).minus(objectToCamera);
 
 					Ray reflectionRay = new Ray(info.getHitPoint(),reflection.normalize());
 
@@ -446,9 +485,9 @@ public class RayTracer {
 					// Reflection ray is cast 
 					CastRay(reflectionRay, reflectionPayload, settings, scene);
 
-					reflection = reflectionPayload.Color.times(info.getMaterial().reflectionCoefficient);
+					reflection = reflectionPayload.Color.timesConst(info.getMaterial().reflectionCoefficient);
 
-					illumination = reflection.plus(illumination.times(1-info.getMaterial().reflectionCoefficient));
+					illumination = reflection.plus(illumination.timesConst(1-info.getMaterial().reflectionCoefficient));
 
 				}
 

@@ -17,7 +17,7 @@ public class Ray {
 		direction = d;
 		
 		// Precomputation used for AABB
-		invDirection = new Vector(1,1,1).divComponents(direction);
+		invDirection = direction.inverseDivide(1);
 		sign[0] =  invDirection.x() < 0 ? 1 : 0;
 		sign[1] =  invDirection.y() < 0 ? 1 : 0;
 		sign[2] =  invDirection.z() < 0 ? 1 : 0;
@@ -28,7 +28,7 @@ public class Ray {
 	//Usage: position = atTime(t);
 	Vector atTime(double t)
 	{
-		return origin.plus(direction.times(t));
+		return origin.plus(direction.timesConst(t));
 	}
 
 	@Override

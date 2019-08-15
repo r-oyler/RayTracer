@@ -25,6 +25,58 @@ public class Matrix4 {
 		return translationMatrix(p.x(),p.y(),p.z());
 	}
 
+	public static Matrix4 xRotationMatrix(double theta) {
+
+		double d[][] = {
+				{1,0,0,0},
+				{0,Math.cos(-theta),Math.sin(-theta),0},
+				{0,-Math.sin(-theta),Math.cos(-theta),0},
+				{0,0,0,1}
+				};
+
+		return new Matrix4(d);
+
+	}
+
+	public static Matrix4 yRotationMatrix(double theta) {
+
+		double d[][] = {
+				{Math.cos(-theta),0,-Math.sin(-theta),0},
+				{0,1,0,0},
+				{Math.sin(-theta),0,Math.cos(-theta),0},
+				{0,0,0,1}
+				};
+
+		return new Matrix4(d);
+
+	}
+
+	public static Matrix4 zRotationMatrix(double theta) {
+
+		double d[][] = {
+				{Math.cos(-theta),Math.sin(-theta),0,0},
+				{-Math.sin(-theta),Math.cos(-theta),0,0},
+				{0,0,1,0},
+				{0,0,0,1}
+				};
+
+		return new Matrix4(d);
+
+	}
+	
+	public static Matrix4 scaleMatrix(double xScale, double yScale, double zScale) {
+		
+		double[][] d = new double[][]{
+			{1/xScale,0,0,0},
+			{0,1/yScale,0,0},
+			{0,0,1/zScale,0},
+			{0,0,0,1}
+		};
+		
+		return new Matrix4(d	);
+		
+	}
+	
 	Matrix4 add(Matrix4 m) {
 
 		double[][] sum = new double[4][4];
@@ -61,7 +113,9 @@ public class Matrix4 {
 
 	}
 
-	Vector times(Vector v) {
+	Vector timesV(Vector v) {
+
+		if (v.dim != 4) throw new IllegalArgumentException("Cannot multiply matrix by vector with dimension != 4");
 
 		double[] prod = new double[4];
 
@@ -83,6 +137,33 @@ public class Matrix4 {
 
 	}
 
+	
+	// Return C = AB
+	// where A = this and B = m
+	Matrix4 times(Matrix4 m) {
+		
+		double[][] d = new double [4][4];
+		
+		for (int i = 0; i < 4; i++) {
+			
+			for (int j = 0; j < 4; j++) {
+				
+				double sum = 0;
+				
+				for (int k = 0; k < 4; k++) {
+					sum += this.d[i][k] * m.d[k][j];
+				}
+				
+				d[i][j] = sum;
+				
+			}
+			
+		}
+		
+		return new Matrix4(d);
+		
+	}
+	
 	// Source: https://www.scratchapixel.com/lessons/mathematics-physics-for-computer-graphics/lookat-function
 	// TODO: test and fix
 	static Matrix4 lookAt(Vector from, Vector to, Vector tmp) {
@@ -115,17 +196,17 @@ public class Matrix4 {
 	public Matrix4 inverse() {
 		return Invert.invert(this);
 	}
-	
+
 	public Matrix4 transpose() {
-		
+
 		double[][] m = new double[4][4];
-		
+
 		for (int i = 0; i<4; i++) {
 			for (int j = 0; j<4; j++) {
 				m[i][j] = this.d[j][i];
 			}
 		}
-		
+
 		return new Matrix4(m);
 	}
 
@@ -154,5 +235,5 @@ public class Matrix4 {
 	public Matrix4 clone() {
 		return new Matrix4(this.d);
 	}
-	
+
 }
