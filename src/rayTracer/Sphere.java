@@ -1,7 +1,5 @@
 package rayTracer;
 
-import java.awt.image.BufferedImage;
-
 // A sphere, defined by a centre point and radius
 public class Sphere extends MatObject {
 	

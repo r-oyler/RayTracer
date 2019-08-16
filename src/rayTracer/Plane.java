@@ -1,8 +1,5 @@
 package rayTracer;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-
 // A plane, defined by a point on the plane and a normal vector
 public class Plane extends MatObject {
 

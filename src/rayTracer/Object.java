@@ -170,11 +170,11 @@ class Material {
 		reflectionCoefficient = r;
 	}
 
-	static Material RED = new Material("TEST_RED");
-	static Material GREEN = new Material("TEST_GREEN");
-	static Material BLUE = new Material("TEST_BLUE");
-	static Material YELLOW = new Material("TEST_YELLOW");
-	static Material BLACK = new Material("TEST_BLACK");
+	static Material RED = new Material("RED");
+	static Material GREEN = new Material("GREEN");
+	static Material BLUE = new Material("BLUE");
+	static Material YELLOW = new Material("YELLOW");
+	static Material BLACK = new Material("BLACK");
 	static Material MIRROR = new Material("MIRROR");
 
 	static {

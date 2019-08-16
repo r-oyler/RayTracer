@@ -13,7 +13,7 @@ public class RayTracer {
 
 	private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 
-	public static void main(String args[]) throws Exception {
+	public static void main(String args[]) throws InterruptedException, IOException {
 				
 		// Toggle for using multi-threading
 		boolean multiThreading = true;
@@ -21,12 +21,13 @@ public class RayTracer {
 		Settings settings = new Settings();
 
 		// Dimensions of image
-		settings.setWindowXY(640,480);
+		//settings.setWindowXY(640,480);
+		settings.setWindowXY(1366, 768);
 		//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
 		settings.setFov(90f);
 
 		// Settings for supersampling anti-aliasing
-		settings.setSSColRowMax(1,1);
+		settings.setSSColRowMax(3,3);
 
 		// Maximum depth that reflection/refraction rays are cast
 		settings.setMaxRecursionDepth(7);
@@ -213,22 +214,28 @@ public class RayTracer {
 		
 		case 9:{
 			
-			Plane p = new Plane(new Vector(0,-1,0), Material.BLACK, new Vector(0,1,0));
+			Plane p0 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(0,1,0));
+			Plane p1 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(0,0,1));
+			Plane p2 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(1,0,0));
 			
-			p.addTextureMap("checkerboard.png");
-			
-			Sphere s = new Sphere(new Vector(0,1.5,0), Material.BLACK, 1);
+			p0.addTextureMap("gridred.png");
+			p1.addTextureMap("gridgreen.png");
+			p2.addTextureMap("gridblue.png");
+						
+			Sphere s = new Sphere(new Vector(1,1,1), Material.BLACK, 0.9);
 			
 			s.addTextureMap("coloredgrid.png");
 			
-			Vector camPos = new Vector(0,5,5);
+			Vector camPos = new Vector(3,3,3);
 			Vector lightPos = camPos;
 			
-			scene.addObject(p);
+			scene.addObject(p0);
+			scene.addObject(p1);
+			scene.addObject(p2);
 			scene.addObject(s);
 			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
 			
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+			scene.setViewMatrix(Matrix4.lookAt(camPos, s.p0, new Vector(0,1,0)));
 			
 			break;
 		}
