@@ -16,7 +16,7 @@ public class RayTracer {
 	public static void main(String args[]) throws Exception {
 				
 		// Toggle for using multi-threading
-		boolean multiThreading = false;
+		boolean multiThreading = true;
 		
 		Settings settings = new Settings();
 
@@ -41,7 +41,7 @@ public class RayTracer {
 		scene.setBackgroundColor(new Vector(20f,0f,20f));;
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = 7;
+		int sceneNum = 9;
 		switch(sceneNum) {
 
 		case 0:
@@ -161,14 +161,8 @@ public class RayTracer {
 		case 6:{
 
 			Sphere s = new Sphere(new Vector(0,0,0), Material.BLACK, 2);
-			BufferedImage bI = null;
-			try {
-				bI = ImageIO.read(new File("2k_moon.jpg"));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			s.addTextureMap(bI);
+			
+			s.addTextureMap("2k_moon.jpg");
 
 			Vector camPos = new Vector(4,4,4);
 			Vector ligPos = new Vector(0,0,4);
@@ -211,6 +205,30 @@ public class RayTracer {
 			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
 
 			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
+			
+//			aabb.rotateX(Util.degreeToRadian(1));
+			
+			break;
+		}
+		
+		case 9:{
+			
+			Plane p = new Plane(new Vector(0,-1,0), Material.BLACK, new Vector(0,1,0));
+			
+			p.addTextureMap("checkerboard.png");
+			
+			Sphere s = new Sphere(new Vector(0,1.5,0), Material.BLACK, 1);
+			
+			s.addTextureMap("coloredgrid.png");
+			
+			Vector camPos = new Vector(0,5,5);
+			Vector lightPos = camPos;
+			
+			scene.addObject(p);
+			scene.addObject(s);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
 			
 			break;
 		}
@@ -327,10 +345,6 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 						
-						if (column == 320 && row == 240) {
-							System.out.println();
-						}
-						
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
@@ -387,21 +401,8 @@ public class RayTracer {
 
 			Vector illumination = new Vector(0,0,0);
 
-			if (info.getObject().hasTextureMap) {
-
-				MatObject o = info.getObject();
-				BufferedImage bI = ((Sphere)o).texture;
-
-				double u = o.u(info.getHitPoint());
-				double v = o.v(info.getHitPoint());
-
-				int iU = (int) (u * bI.getWidth());
-				int iV = (int) (v * bI.getHeight());
-
-				int rgb = info.getObject().texture.getRGB(iU, iV);
-				Color c = new Color(rgb);
-
-				payload.setColor(new Vector(c.getRed(),c.getGreen(),c.getBlue()));
+			if (info.hasUV) {
+				payload.setColor(info.getUVcolor());
 				return info.getTime();
 			}
 

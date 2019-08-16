@@ -62,15 +62,9 @@ public class AABB extends MatObject {
 	}
 
 	@Override
-	double u(Vector hitPoint) {
+	Vector calcUV(Vector hitPoint) {
 		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	double v(Vector hitPoint) {
-		// TODO Auto-generated method stub
-		return 0;
+		return null;
 	}
 
 	@Override

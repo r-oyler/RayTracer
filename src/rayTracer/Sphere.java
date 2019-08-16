@@ -1,5 +1,7 @@
 package rayTracer;
 
+import java.awt.image.BufferedImage;
+
 // A sphere, defined by a centre point and radius
 public class Sphere extends MatObject {
 	
@@ -52,10 +54,14 @@ public class Sphere extends MatObject {
         }
         
         if (time < info.getTime()) { // if this intersection is the closest so far (or first)        	
+        	Vector hitPoint = ray.atTime(time);
+        	
         	info.setTime(time);
-            info.setHitPoint(ray.atTime(time));
+            info.setHitPoint(hitPoint);
             info.setNormal(info.getHitPoint().minus(this.Position()).normalize());
-            info.setMaterial(this.material);
+           
+            Vector color = this.getUVcolor(this.calcUV(hitPoint));
+			info.setUVcolor(color);
             info.setObject(this);
             info.setObjectName(this.name);
         }
@@ -80,30 +86,32 @@ public class Sphere extends MatObject {
 		return (centreDistance-radiusSum);
 		
 	}
-	
-	public double u(Vector hitPoint) {
-		
-		Vector hitPointToCentre = (this.Position().minus(hitPoint)).normalize();
-		
-		double u = 0.5 + Math.atan2(hitPointToCentre.z(), hitPointToCentre.x())/(2*Math.PI);
-		
-		return 1-u;
-		
-	}
-	
-	public double v(Vector hitPoint) {
-		
-		Vector hitPointToCentre = (this.Position().minus(hitPoint)).normalize();
-		
-		double v = 0.5 - Math.asin(hitPointToCentre.y())/Math.PI;
-		
-		return 1-v;
-		
-	}
 
+	public Vector calcUV(Vector hitPoint) {
+		
+		Vector hitPointToCentre = (this.Position().minus(hitPoint)).normalize();
+		
+		double[] uv = new double[2];
+		
+		uv[0] = 0.5 - Math.atan2(hitPointToCentre.z(), hitPointToCentre.x())/(2*Math.PI);
+		
+		uv[1]  = 0.5 + Math.asin(hitPointToCentre.y())/Math.PI;
+		
+		return new Vector(uv);
+		
+	}
+	
 	@Override
 	public MatObject clone() {
-		return new Sphere(this.p0.clone(),this.material.clone(),this.radius);
+				
+		Sphere clone = new Sphere(this.p0.clone(),this.material.clone(),this.radius);
+	
+		if (this.hasTextureMap) {
+			clone.addTextureMap(Util.deepCopy(this.texture));
+		}
+		
+		return clone;
+		
 	}
 	
 }

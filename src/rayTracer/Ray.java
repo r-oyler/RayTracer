@@ -49,6 +49,10 @@ class IntersectInfo{
 	//The material of the object that was intersected
 	Material material;
 	
+	boolean hasUV = false;
+	
+	Vector uvColor;
+	
 	MatObject object;
 	
 	String objectName;
@@ -76,6 +80,13 @@ class IntersectInfo{
 	}
 	public void setMaterial(Material material) {
 		this.material = material;
+	}
+	public Vector getUVcolor() {
+		return uvColor;
+	}
+	public void setUVcolor(Vector uvColor) {
+		this.uvColor = uvColor;
+		this.hasUV = true;
 	}
 	public MatObject getObject() {
 		return this.object;

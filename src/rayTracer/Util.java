@@ -1,5 +1,9 @@
 package rayTracer;
 
+import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
+
 public class Util {
 
 	// Check if input is between min and max, inclusive
@@ -110,5 +114,12 @@ public class Util {
 		return degrees * Math.PI/180.0;
 		
 	}
+
+	static BufferedImage deepCopy(BufferedImage bi) {
+		 ColorModel cm = bi.getColorModel();
+		 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		 WritableRaster raster = bi.copyData(null);
+		 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+		}
 	
 }
