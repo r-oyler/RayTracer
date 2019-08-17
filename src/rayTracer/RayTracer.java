@@ -530,10 +530,8 @@ public class RayTracer {
 
 			if (info.getMaterial().isReflective) {
 
-				Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
-
 				Vector normal = info.getNormal();
-				Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToCamera)).minus(objectToCamera);
+				Vector reflection = Util.reflect(ray.direction, normal);
 
 				Ray reflectionRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getBias())),reflection.normalize());
 
