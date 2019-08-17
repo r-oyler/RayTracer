@@ -262,7 +262,7 @@ public class RayTracer {
 			Sphere s = new Sphere(new Vector(1,1,1), Material.GLASS, 0.5);
 
 			Vector camPos = new Vector(3,3,3);
-			Vector lightPos = new Vector(3,5,2);
+			Vector lightPos = new Vector(3,3,3);
 
 			scene.addObject(p0);
 			scene.addObject(p1);
@@ -474,7 +474,9 @@ public class RayTracer {
 					shadowRayInfo.setTime(Double.POSITIVE_INFINITY);
 
 					for (MatObject obj : scene.getObjects()) {
-						obj.Intersect(shadowRay, shadowRayInfo); // shadowRayInfo becomes info of nearest intersection, if any
+						if (!obj.material.isRefractive){	// Refractive materials don't cast shadows				
+							obj.Intersect(shadowRay, shadowRayInfo); // shadowRayInfo becomes info of nearest intersection, if any
+						}
 					}
 
 					if (shadowRayInfo.getTime()>=timeToLight) { // no intersections with objects occur between object and light
