@@ -14,25 +14,35 @@ public class RayTracer {
 	private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 
 	public static void main(String args[]) throws InterruptedException, IOException {
-				
+
 		// Toggle for using multi-threading
 		boolean multiThreading = true;
-		
+
 		Settings settings = new Settings();
 
-		// Dimensions of image
-		//settings.setWindowXY(640,480);
-		settings.setWindowXY(1366, 768);
-		//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
-		settings.setFov(90f);
+		boolean getUserInput = Input.getBoolean("Choose custom inputs?");
 
-		// Settings for supersampling anti-aliasing
-		settings.setSSColRowMax(3,3);
+		if (getUserInput) {
+			settings = Input.getSettings();
+			System.exit(1);
+		}
+		
+		else {
+			
+			// Dimensions of image
+			settings.setWindowXY(1366, 768);
+			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
+			settings.setFov(90);
 
-		// Maximum depth that reflection/refraction rays are cast
-		settings.setMaxRecursionDepth(7);
-		// Distance that shadow ray origins are moved along the surface normal to prevent shadow acne
-		settings.setShadowRayBias(0.0001);		
+			// Settings for supersampling anti-aliasing
+			settings.setSSColRowMax(1,1);
+
+			// Maximum depth that reflection/refraction rays are cast
+			settings.setMaxRecursionDepth(7);
+			// Distance that shadow ray origins are moved along the surface normal to prevent shadow acne
+			settings.setShadowRayBias(0.0001);		
+
+		}
 
 		Scene scene = new Scene();
 
@@ -42,7 +52,7 @@ public class RayTracer {
 		scene.setBackgroundColor(new Vector(20f,0f,20f));;
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = 9;
+		int sceneNum = Input.getInt("Scene number", 9, 0, 9);
 		switch(sceneNum) {
 
 		case 0:
@@ -162,7 +172,7 @@ public class RayTracer {
 		case 6:{
 
 			Sphere s = new Sphere(new Vector(0,0,0), Material.BLACK, 2);
-			
+
 			s.addTextureMap("2k_moon.jpg");
 
 			Vector camPos = new Vector(4,4,4);
@@ -175,12 +185,12 @@ public class RayTracer {
 		}
 
 		case 7:{
-			
+
 			AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
 			AABB aabb2 = new AABB(new Vector(5,1,1), Material.BLUE, new Vector(1,1,1));
 			AABB aabb3 = new AABB(new Vector(1,5,1), Material.YELLOW, new Vector(1,1,1));
 			AABB aabb4 = new AABB(new Vector(1,1,5), Material.GREEN, new Vector(1,1,1));
-			
+
 			Vector camPos = new Vector(8,8,8);
 			Vector lightPos = camPos;
 
@@ -191,14 +201,14 @@ public class RayTracer {
 			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
 
 			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
-			
+
 			break;
 		}
-		
+
 		case 8:{
-			
+
 			AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
-			
+
 			Vector camPos = new Vector(8,8,8);
 			Vector lightPos = camPos;
 
@@ -206,40 +216,40 @@ public class RayTracer {
 			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
 
 			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
-			
-//			aabb.rotateX(Util.degreeToRadian(1));
-			
+
+			//			aabb.rotateX(Util.degreeToRadian(1));
+
 			break;
 		}
-		
+
 		case 9:{
-			
+
 			Plane p0 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(0,1,0));
 			Plane p1 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(0,0,1));
 			Plane p2 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(1,0,0));
-			
+
 			p0.addTextureMap("gridred.png");
 			p1.addTextureMap("gridgreen.png");
 			p2.addTextureMap("gridblue.png");
-						
+
 			Sphere s = new Sphere(new Vector(1,1,1), Material.BLACK, 0.9);
-			
-			s.addTextureMap("coloredgrid.png");
-			
+
+			s.addTextureMap("checkerboard.png");
+
 			Vector camPos = new Vector(3,3,3);
 			Vector lightPos = camPos;
-			
+
 			scene.addObject(p0);
 			scene.addObject(p1);
 			scene.addObject(p2);
 			scene.addObject(s);
 			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-			
+
 			scene.setViewMatrix(Matrix4.lookAt(camPos, s.p0, new Vector(0,1,0)));
-			
+
 			break;
 		}
-		
+
 		}
 
 		long startTime = System.currentTimeMillis();
@@ -253,38 +263,38 @@ public class RayTracer {
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		if (multiThreading) {
-			
+
 			int processors = Runtime.getRuntime().availableProcessors();
-			
+
 			int colsPerThread = settings.getWindowX()/processors;
-			
+
 			for (int i = 0; i < processors; i++) {
-				
+
 				int startCol = i * colsPerThread;
 				int endCol = (i+1) * colsPerThread;
-				
+
 				RayTraceRunnable runnable = new RayTraceRunnable(img, startCol, endCol, settings.clone(), scene.clone());
 				Thread t = new Thread(runnable);
 				t.start();
 				arrThreads.add(t);
-				
+
 			}
 
 			for (int i = 0; i < arrThreads.size(); i++) 
 			{
 				arrThreads.get(i).join(); 
 			}
-			
+
 		}
-		
+
 		else {
-			
+
 			rayTrace(img, 0, settings.getWindowX(), settings, scene);
-			
+
 		}
-		
+
 		File outputfile = new File("saved.png");
 		ImageIO.write(img, "png", outputfile);
 
@@ -351,7 +361,7 @@ public class RayTracer {
 						payload.setNumBounces(0);
 
 						Vector color = scene.getBackgroundColor();
-						
+
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
@@ -372,8 +382,8 @@ public class RayTracer {
 
 			}
 
-//			double percent = ((double)column*100)/((double)settings.getWindowX());
-//			System.out.println(percent + "%");
+			//			double percent = ((double)column*100)/((double)settings.getWindowX());
+			//			System.out.println(percent + "%");
 
 		}
 

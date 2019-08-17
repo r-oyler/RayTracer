@@ -131,6 +131,9 @@ class Material {
 	boolean isReflective = false;
 	double reflectionCoefficient = 0;
 
+	boolean isRefractive = false;
+	double refractiveIndex = 0;
+	
 	//Name, useful for debugging
 	String name;
 
@@ -176,7 +179,9 @@ class Material {
 	static Material YELLOW = new Material("YELLOW");
 	static Material BLACK = new Material("BLACK");
 	static Material MIRROR = new Material("MIRROR");
-
+	final static double WATER_IOR = 1.3;
+	final static double GLASS_IOR = 1.5;
+	
 	static {
 		RED.setAmbient(new Vector(1,0,0));
 		RED.setDiffuse(new Vector(1,0,0));
