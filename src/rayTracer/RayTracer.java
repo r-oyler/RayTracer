@@ -24,7 +24,6 @@ public class RayTracer {
 
 		if (getUserInput) {
 			settings = Input.getSettings();
-			System.exit(1);
 		}
 		
 		else {
