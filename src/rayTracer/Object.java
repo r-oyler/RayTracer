@@ -92,6 +92,8 @@ abstract class MatObject extends Object {
 
 		Vector color = new Vector(c.getRed(),c.getGreen(),c.getBlue());
 
+		color = color.divide(255);
+		
 		return color;
 
 	}
@@ -179,6 +181,8 @@ class Material {
 	static Material YELLOW = new Material("YELLOW");
 	static Material BLACK = new Material("BLACK");
 	static Material MIRROR = new Material("MIRROR");
+	static Material TEXTURE = new Material("TEXTURE");
+	
 	final static double WATER_IOR = 1.3;
 	final static double GLASS_IOR = 1.5;
 	
@@ -204,6 +208,9 @@ class Material {
 		BLACK.setSpecular(new Vector(0.7,0.7,0.7), 200);
 
 		MIRROR.setReflective(0.8);
+		
+		TEXTURE.setAmbient(new Vector(1,1,1));
+		TEXTURE.setDiffuse(new Vector(1,1,1));
 	}
 
 	@Override

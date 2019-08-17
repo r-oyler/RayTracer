@@ -25,16 +25,16 @@ public class RayTracer {
 		if (getUserInput) {
 			settings = Input.getSettings();
 		}
-		
+
 		else {
-			
+
 			// Dimensions of image
 			settings.setWindowXY(1366, 768);
 			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
 			settings.setFov(90);
 
 			// Settings for supersampling anti-aliasing
-			settings.setSSColRowMax(1,1);
+			settings.setSSColRowMax(3,3);
 
 			// Maximum depth that reflection/refraction rays are cast
 			settings.setMaxRecursionDepth(7);
@@ -223,20 +223,20 @@ public class RayTracer {
 
 		case 9:{
 
-			Plane p0 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(0,1,0));
-			Plane p1 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(0,0,1));
-			Plane p2 = new Plane(new Vector(0,0,0), Material.BLACK, new Vector(1,0,0));
+			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
 
 			p0.addTextureMap("gridred.png");
 			p1.addTextureMap("gridgreen.png");
 			p2.addTextureMap("gridblue.png");
 
-			Sphere s = new Sphere(new Vector(1,1,1), Material.BLACK, 0.9);
+			Sphere s = new Sphere(new Vector(1,1,1), Material.TEXTURE, 0.5);
 
 			s.addTextureMap("checkerboard.png");
 
 			Vector camPos = new Vector(3,3,3);
-			Vector lightPos = camPos;
+			Vector lightPos = new Vector(3,5,2);
 
 			scene.addObject(p0);
 			scene.addObject(p1);
@@ -417,104 +417,113 @@ public class RayTracer {
 
 			Vector illumination = new Vector(0,0,0);
 
-			if (info.hasUV) {
-				payload.setColor(info.getUVcolor());
-				return info.getTime();
+			if (info.getMaterial().isAmbient) {
+
+				Vector ambient;
+
+				if (info.hasUV) {
+					ambient = scene.getAmbientLight().multComponents(info.getMaterial().ambient.multComponents(info.getUVcolor()));
+				}
+				else {
+					ambient = scene.getAmbientLight().multComponents(info.getMaterial().ambient);
+				}
+				illumination = illumination.plus(ambient);
 			}
 
-			else {
 
-				if (info.getMaterial().isAmbient) {
-					Vector ambient = scene.getAmbientLight().multComponents(info.getMaterial().ambient);
-					illumination = illumination.plus(ambient);
-				}
+			// Diffuse and specular illumination
+			if (info.getMaterial().isDiffuse || info.getMaterial().isSpecular) {
 
+				for (Light l: scene.getLights()) {
 
-				// Diffuse and specular illumination
-				if (info.getMaterial().isDiffuse || info.getMaterial().isSpecular) {
+					Vector objectToLight = l.Position().minus(info.getHitPoint());
+					double timeToLight = objectToLight.length();
+					objectToLight = objectToLight.normalize();
+					Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getShadowRayBias())), objectToLight);
+					IntersectInfo shadowRayInfo = new IntersectInfo();
+					shadowRayInfo.setTime(Double.POSITIVE_INFINITY);
 
-					for (Light l: scene.getLights()) {
+					for (MatObject obj : scene.getObjects()) {
+						obj.Intersect(shadowRay, shadowRayInfo); // shadowRayInfo becomes info of nearest intersection, if any
+					}
 
-						Vector objectToLight = l.Position().minus(info.getHitPoint());
-						double timeToLight = objectToLight.length();
-						objectToLight = objectToLight.normalize();
-						Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getShadowRayBias())), objectToLight);
-						IntersectInfo shadowRayInfo = new IntersectInfo();
-						shadowRayInfo.setTime(Double.POSITIVE_INFINITY);
+					if (shadowRayInfo.getTime()>=timeToLight) { // no intersections with objects occur between object and light
 
-						for (MatObject obj : scene.getObjects()) {
-							obj.Intersect(shadowRay, shadowRayInfo); // shadowRayInfo becomes info of nearest intersection, if any
-						}
+						if (info.getMaterial().isDiffuse) {
+							// Diffuse illumination
 
-						if (shadowRayInfo.getTime()>=timeToLight) { // no intersections with objects occur between object and light
+							Vector normal = info.getNormal();
+							double cosTheta = objectToLight.cosAngleBetween(normal);
 
-							if (info.getMaterial().isDiffuse) {
-								// Diffuse illumination
-
-								Vector normal = info.getNormal();
-								double cosTheta = objectToLight.cosAngleBetween(normal);
-
-								if (cosTheta == 0) {
-									System.out.println("Help");
-								}
-
-								cosTheta = Math.max(0, cosTheta);
-								Vector diffuse = l.getColor().multComponents(info.getMaterial().diffuse).timesConst(cosTheta);
-
-								illumination = illumination.plus(diffuse);
+							if (cosTheta == 0) {
+								System.out.println("Help");
 							}
 
-							if (info.getMaterial().isSpecular) {
-								// Specular illumination
+							cosTheta = Math.max(0, cosTheta);
 
-								Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
+							Vector diffuse;
 
-								Vector normal = info.getNormal();
-								Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToLight)).minus(objectToLight);
-
-								double cosAngle = reflection.cosAngleBetween(objectToCamera);
-								cosAngle = Math.max(0, cosAngle);
-								cosAngle = Math.pow(cosAngle, info.getMaterial().specularExponent);
-
-								Vector specular = l.getColor().multComponents(info.getMaterial().specular).timesConst(cosAngle);
-
-								illumination = illumination.plus(specular);
-
+							if (info.hasUV) {
+								diffuse = l.getColor().multComponents(info.getMaterial().diffuse.multComponents(info.getUVcolor())).timesConst(cosTheta);
 							}
+							else {
+								diffuse = l.getColor().multComponents(info.getMaterial().diffuse).timesConst(cosTheta);
+							}
+
+							illumination = illumination.plus(diffuse);
 						}
 
+						if (info.getMaterial().isSpecular) {
+							// Specular illumination
+
+							Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
+
+							Vector normal = info.getNormal();
+							Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToLight)).minus(objectToLight);
+
+							double cosAngle = reflection.cosAngleBetween(objectToCamera);
+							cosAngle = Math.max(0, cosAngle);
+							cosAngle = Math.pow(cosAngle, info.getMaterial().specularExponent);
+
+							Vector specular = l.getColor().multComponents(info.getMaterial().specular).timesConst(cosAngle);
+
+							illumination = illumination.plus(specular);
+
+						}
 					}
 
 				}
 
-				if (info.getMaterial().isReflective) {
-
-					Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
-
-					Vector normal = info.getNormal();
-					Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToCamera)).minus(objectToCamera);
-
-					Ray reflectionRay = new Ray(info.getHitPoint(),reflection.normalize());
-
-					Payload reflectionPayload = new Payload();
-					reflectionPayload.setNumBounces(payload.numBounces+1);
-
-					// Reflection ray is cast 
-					CastRay(reflectionRay, reflectionPayload, settings, scene);
-
-					reflection = reflectionPayload.Color.timesConst(info.getMaterial().reflectionCoefficient);
-
-					illumination = reflection.plus(illumination.timesConst(1-info.getMaterial().reflectionCoefficient));
-
-				}
-
-				//illumination = ambient;
-				//illumination = totalDiffuse;
-				//illumination = totalSpecular;
-
-				payload.setColor(illumination);
-				return info.getTime();
 			}
+
+			if (info.getMaterial().isReflective) {
+
+				Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
+
+				Vector normal = info.getNormal();
+				Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToCamera)).minus(objectToCamera);
+
+				Ray reflectionRay = new Ray(info.getHitPoint(),reflection.normalize());
+
+				Payload reflectionPayload = new Payload();
+				reflectionPayload.setNumBounces(payload.numBounces+1);
+
+				// Reflection ray is cast 
+				CastRay(reflectionRay, reflectionPayload, settings, scene);
+
+				reflection = reflectionPayload.Color.timesConst(info.getMaterial().reflectionCoefficient);
+
+				illumination = reflection.plus(illumination.timesConst(1-info.getMaterial().reflectionCoefficient));
+
+			}
+
+			//illumination = ambient;
+			//illumination = totalDiffuse;
+			//illumination = totalSpecular;
+
+			payload.setColor(illumination);
+			return info.getTime();
+
 		}
 
 		return 0.0f;
