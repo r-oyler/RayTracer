@@ -16,7 +16,7 @@ public class RayTracer {
 	public static void main(String args[]) throws InterruptedException, IOException {
 
 		// Toggle for using multi-threading
-		boolean multiThreading = true;
+		boolean multiThreading = false;
 
 		Settings settings = new Settings();
 
@@ -34,12 +34,12 @@ public class RayTracer {
 			settings.setFov(90);
 
 			// Settings for supersampling anti-aliasing
-			settings.setSSColRowMax(3,3);
+			settings.setSSColRowMax(1,1);
 
 			// Maximum depth that reflection/refraction rays are cast
 			settings.setMaxRecursionDepth(7);
 			// Distance that shadow ray origins are moved along the surface normal to prevent shadow acne
-			settings.setShadowRayBias(0.0001);		
+			settings.setBias(0.0001);		
 
 		}
 
@@ -51,7 +51,7 @@ public class RayTracer {
 		scene.setBackgroundColor(new Vector(20f,0f,20f));;
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 9, 0, 9);
+		int sceneNum = Input.getInt("Scene number", 10, 0, 10);
 		switch(sceneNum) {
 
 		case 0:
@@ -248,6 +248,32 @@ public class RayTracer {
 
 			break;
 		}
+		
+		case 10:{
+
+			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
+
+			p0.addTextureMap("gridred.png");
+			p1.addTextureMap("gridgreen.png");
+			p2.addTextureMap("gridblue.png");
+
+			Sphere s = new Sphere(new Vector(1,1,1), Material.GLASS, 0.5);
+
+			Vector camPos = new Vector(3,3,3);
+			Vector lightPos = new Vector(3,5,2);
+
+			scene.addObject(p0);
+			scene.addObject(p1);
+			scene.addObject(p2);
+			scene.addObject(s);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(1,1,1), new Vector(0,1,0)));
+
+			break;
+		}
 
 		}
 
@@ -361,6 +387,10 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 
+//						if (column == 683 && row == 384) {
+//							System.out.println();
+//						}
+						
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
@@ -439,7 +469,7 @@ public class RayTracer {
 					Vector objectToLight = l.Position().minus(info.getHitPoint());
 					double timeToLight = objectToLight.length();
 					objectToLight = objectToLight.normalize();
-					Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getShadowRayBias())), objectToLight);
+					Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getBias())), objectToLight);
 					IntersectInfo shadowRayInfo = new IntersectInfo();
 					shadowRayInfo.setTime(Double.POSITIVE_INFINITY);
 
@@ -503,7 +533,7 @@ public class RayTracer {
 				Vector normal = info.getNormal();
 				Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToCamera)).minus(objectToCamera);
 
-				Ray reflectionRay = new Ray(info.getHitPoint(),reflection.normalize());
+				Ray reflectionRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getBias())),reflection.normalize());
 
 				Payload reflectionPayload = new Payload();
 				reflectionPayload.setNumBounces(payload.numBounces+1);
@@ -515,6 +545,52 @@ public class RayTracer {
 
 				illumination = reflection.plus(illumination.timesConst(1-info.getMaterial().reflectionCoefficient));
 
+			}
+			
+			if (info.getMaterial().isRefractive) {
+				
+				double kReflect = Util.fresnel(ray.direction, info.getNormal(), info.getMaterial().refractiveIndex);
+				
+				boolean outside = ray.direction.dotProduct(info.getNormal()) < 0;
+				
+				Vector bias = info.getNormal().timesConst(settings.getBias());
+				
+				// compute refraction if it is not a case of total internal reflection
+				if (kReflect < 1) {
+					
+					Vector refractionDirection = Util.refract(ray.direction, info.getNormal(), info.getMaterial().refractiveIndex);
+					
+					Vector refractionRayOrigin = outside ? info.getHitPoint().minus(bias) : info.getHitPoint().plus(bias);
+					
+					Ray refractionRay = new Ray(refractionRayOrigin, refractionDirection.normalize());
+					
+					Payload refractionPayload = new Payload();
+					refractionPayload.setNumBounces(payload.numBounces+1);
+					
+					CastRay(refractionRay, refractionPayload, settings, scene);
+					
+					Vector refraction = refractionPayload.Color.timesConst(1-kReflect);
+					
+					illumination = illumination.plus(refraction);
+					
+				}
+				
+				Vector reflectionDirection = Util.reflect(ray.direction, info.getNormal());
+				
+				Vector reflectionRayOrigin = outside ? info.getHitPoint().plus(bias) : info.getHitPoint().minus(bias);
+				
+				Ray reflectionRay = new Ray(reflectionRayOrigin, reflectionDirection);
+				
+				Payload reflectionPayload = new Payload();
+				reflectionPayload.setNumBounces(payload.numBounces+1);
+				
+				CastRay(reflectionRay, reflectionPayload, settings, scene);
+				
+				Vector reflection = reflectionPayload.Color.timesConst(kReflect);
+				
+				illumination = illumination.plus(reflection);
+				
+				
 			}
 
 			//illumination = ambient;

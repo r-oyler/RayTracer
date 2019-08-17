@@ -115,11 +115,89 @@ public class Util {
 
 	}
 
-	static BufferedImage deepCopy(BufferedImage bi) {
+	public static BufferedImage deepCopy(BufferedImage bi) {
 		ColorModel cm = bi.getColorModel();
 		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
 		WritableRaster raster = bi.copyData(null);
 		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 
+	// https://www.scratchapixel.com/lessons/3d-basic-rendering/introduction-to-shading/reflection-refraction-fresnel
+	public static double fresnel(Vector incident, Vector normal, double ior) {
+		
+		double kReflect;
+		
+		double cosIncident = clamp(incident.dotProduct(normal),-1,1);
+		
+		// Can only be used for air to refractive object or vice versa transmission
+		double etaIncident = 1;
+		double etaTransmission = ior;
+		
+		if (cosIncident > 0) {
+			double temp = etaIncident;
+			etaIncident = etaTransmission;
+			etaTransmission = temp;
+		}
+		
+		double sinTransmission = (etaIncident/etaTransmission) * Math.sqrt(Math.max(0, 1 - cosIncident * cosIncident));
+		
+		// Total internal reflection
+		if (sinTransmission >= 1) {
+			kReflect = 1;
+		}
+		
+		else {
+			double cosTransmission = Math.sqrt(Math.max(0, 1 - sinTransmission * sinTransmission));
+			cosIncident = Math.abs(cosIncident);
+			double fresnelParralel = ((etaTransmission * cosIncident)-(etaIncident * cosTransmission)) / ((etaTransmission * cosIncident) + (etaIncident * cosTransmission));
+			double fresnelPerpendicular = ((etaIncident * cosIncident)-(etaTransmission * cosTransmission)) / ((etaIncident * cosIncident) + (etaTransmission * cosTransmission));
+			kReflect = (fresnelParralel * fresnelParralel + fresnelPerpendicular * fresnelPerpendicular) / 2;
+		}
+		
+		return kReflect;
+		// As a consequence of the conservation of energy, transmittance is given by:
+		// kTransmit = 1 - kReflect;
+	}
+	
+	public static Vector reflect(Vector incident, Vector normal) {
+		
+		// R = I - (N*(I dot N)) * 2
+		return incident.minus(normal.timesConst(incident.dotProduct(normal)).timesConst(2));
+		
+	}
+	
+	public static Vector refract(Vector incident, Vector normal, double ior) {
+		
+		double cosIncident = clamp(incident.dotProduct(normal),-1,1);
+		
+		double etaIncident = 1;
+		double etaTransmission = ior;
+		
+		if (cosIncident < 0) {
+			cosIncident = -cosIncident;
+		}
+		else {
+			double temp = etaIncident;
+			etaIncident = etaTransmission;
+			etaTransmission = temp;
+			normal = normal.timesConst(-1);
+		}
+		
+		double eta = etaIncident/etaTransmission;
+		
+		double k = 1 - eta * eta * (1 - cosIncident * cosIncident);
+		
+		// Total internal reflection
+		if (k < 0) {
+			return new Vector(0,0,0);
+		}
+		else {
+			
+			// eta * I + (eta * cosi - sqrtf(k)) * n
+			return incident.timesConst(eta).plus(normal.timesConst(eta * cosIncident - Math.sqrt(k)));
+			
+		}
+		
+	}
+	
 }

@@ -53,8 +53,11 @@ public class Plane extends MatObject {
 			info.setNormal(this.normal);
 			info.setMaterial(this.material);
 			
-			Vector color = this.getUVcolor(this.calcUV(hitPoint));
-			info.setUVcolor(color);
+			if (this.hasTextureMap) {
+				Vector color = this.getUVcolor(this.calcUV(hitPoint));
+				info.setUVcolor(color);
+			}
+			
 			info.setObject(this);
 			info.setObjectName(this.name);
 		}

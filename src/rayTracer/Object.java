@@ -174,6 +174,13 @@ class Material {
 		isReflective = true;
 		reflectionCoefficient = r;
 	}
+	
+	public void setRefractive(double r) {
+		if (!Util.isBetweenInc(r, 1, 38.6)) throw new IllegalArgumentException("Refractive index must be a value between 1 and 38.6 inclusive"); 
+
+		isRefractive = true;
+		refractiveIndex = r;
+	}
 
 	static Material RED = new Material("RED");
 	static Material GREEN = new Material("GREEN");
@@ -183,8 +190,9 @@ class Material {
 	static Material MIRROR = new Material("MIRROR");
 	static Material TEXTURE = new Material("TEXTURE");
 	
-	final static double WATER_IOR = 1.3;
-	final static double GLASS_IOR = 1.5;
+	static Material WATER = new Material("WATER");
+	static Material GLASS = new Material("GLASS");
+	static Material DIAMOND = new Material("DIAMOND");
 	
 	static {
 		RED.setAmbient(new Vector(1,0,0));
@@ -211,6 +219,12 @@ class Material {
 		
 		TEXTURE.setAmbient(new Vector(1,1,1));
 		TEXTURE.setDiffuse(new Vector(1,1,1));
+		
+		WATER.setRefractive(1.333);
+		
+		GLASS.setRefractive(1.52);
+		
+		DIAMOND.setRefractive(2.42);
 	}
 
 	@Override
@@ -225,6 +239,7 @@ class Material {
 		if (isDiffuse) clone.setDiffuse(this.diffuse);
 		if (isSpecular) clone.setSpecular(this.specular, this.specularExponent);
 		if (isReflective) clone.setReflective(this.reflectionCoefficient);
+		if (isRefractive) clone.setRefractive(this.refractiveIndex);
 
 		return clone;
 

@@ -57,9 +57,13 @@ public class Sphere extends MatObject {
         	info.setTime(time);
             info.setHitPoint(hitPoint);
             info.setNormal(info.getHitPoint().minus(this.Position()).normalize());
-           
-            Vector color = this.getUVcolor(this.calcUV(hitPoint));
-			info.setUVcolor(color);
+            info.setMaterial(this.material);
+            
+            if (this.hasTextureMap) {
+            	Vector color = this.getUVcolor(this.calcUV(hitPoint));
+    			info.setUVcolor(color);
+            }
+            
             info.setObject(this);
             info.setObjectName(this.name);
         }

@@ -28,7 +28,7 @@ public class Input {
 		
 		double shadowRayBias = getDouble("Shadow ray bias", 0.0001, 0, 1);
 		
-		s.setShadowRayBias(shadowRayBias);
+		s.setBias(shadowRayBias);
 		
 		return s;
 		

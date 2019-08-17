@@ -119,6 +119,20 @@ public class Vector {
 
 		return new Vector(quot);
 	}
+	
+	public boolean equals(Vector v) {
+		
+		if(this.dim != v.dim) return false;
+		
+		boolean equal = true;
+		
+		for (int i = 0; i<this.dim; i++) {
+			equal &= (this.d[i] == v.d[i]);
+		}
+		
+		return equal;
+		
+	}
 
 	double cosAngleBetween(Vector v) {
 
@@ -280,7 +294,7 @@ public class Vector {
 		return result;
 
 	}
-
+	
 	public String toString() {
 
 		String s = "(";

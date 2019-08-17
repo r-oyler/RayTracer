@@ -13,7 +13,8 @@ public class Settings {
 	// Maximum depth that reflection/refraction rays are cast
 	int maxRecursionDepth = 7;
 	// Distance that shadow ray origins are moved along the surface normal to prevent shadow acne
-	double shadowRayBias = 0.0001;
+	// Used similarly for reflection rays and refraction rays
+	double bias = 0.0001;
 	
 	// Calculated values
 	double aspectRatio;
@@ -102,12 +103,12 @@ public class Settings {
 		this.maxRecursionDepth = maxRecursionDepth;
 	}
 
-	public double getShadowRayBias() {
-		return shadowRayBias;
+	public double getBias() {
+		return bias;
 	}
 
-	public void setShadowRayBias(double shadowRayBias) {
-		this.shadowRayBias = shadowRayBias;
+	public void setBias(double bias) {
+		this.bias = bias;
 	}
 
 	public double getAspectRatio() {
@@ -137,7 +138,7 @@ public class Settings {
 		clone.setFov(this.getFov());
 		clone.setSSColRowMax(this.getSSColumnMax(), this.getSSRowMax());
 		clone.setMaxRecursionDepth(this.getMaxRecursionDepth());
-		clone.setShadowRayBias(this.getShadowRayBias());
+		clone.setBias(this.getBias());
 		
 		return clone;
 		
