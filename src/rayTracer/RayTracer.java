@@ -51,7 +51,7 @@ public class RayTracer {
 		String outputFileName = Input.getString("Output file name", "saved.png");
 		
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 10, 0, 10);
+		int sceneNum = Input.getInt("Scene number", 11, 0, 11);
 		switch(sceneNum) {
 
 		case 0:
@@ -275,6 +275,38 @@ public class RayTracer {
 			break;
 		}
 
+		case 11:{
+
+			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
+
+			p0.addTextureMap("gridred.png");
+			p1.addTextureMap("coloredgrid.png");
+			p2.addTextureMap("gridblue.png");
+
+			Sphere s0 = new Sphere(new Vector(1,1,1), Material.DIAMOND, 0.5);
+			Sphere s1 = new Sphere(new Vector(3,1,1), Material.SAPPHIRE, 0.5);
+			Sphere s2 = new Sphere(new Vector(5,1,1), Material.EMERALD, 0.5);
+			Sphere s3 = new Sphere(new Vector(7,1,1), Material.RUBY, 0.5);
+			
+			Vector camPos = new Vector(4,1,5);
+			Vector lightPos = new Vector(4,4,3);
+
+			scene.addObject(p0);
+			scene.addObject(p1);
+			scene.addObject(p2);
+			scene.addObject(s0);
+			scene.addObject(s1);
+			scene.addObject(s2);
+			scene.addObject(s3);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
+
+			break;
+		}
+		
 		}
 
 		long startTime = System.currentTimeMillis();
@@ -543,6 +575,8 @@ public class RayTracer {
 
 				reflection = reflectionPayload.Color.timesConst(info.getMaterial().reflectionCoefficient);
 
+				reflection = reflection.multComponents(info.getMaterial().getReflectRefractTint());
+				
 				illumination = reflection.plus(illumination.timesConst(1-info.getMaterial().reflectionCoefficient));
 
 			}
@@ -571,6 +605,8 @@ public class RayTracer {
 					
 					Vector refraction = refractionPayload.Color.timesConst(1-kReflect);
 					
+					refraction = refraction.multComponents(info.getMaterial().getReflectRefractTint());
+					
 					illumination = illumination.plus(refraction);
 					
 				}
@@ -587,6 +623,8 @@ public class RayTracer {
 				CastRay(reflectionRay, reflectionPayload, settings, scene);
 				
 				Vector reflection = reflectionPayload.Color.timesConst(kReflect);
+				
+				reflection = reflection.multComponents(info.getMaterial().getReflectRefractTint());
 				
 				illumination = illumination.plus(reflection);
 				

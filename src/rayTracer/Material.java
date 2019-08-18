@@ -19,6 +19,8 @@ public class Material {
 	boolean isRefractive = false;
 	double refractiveIndex = 0;
 	
+	Vector reflectRefractTint;
+	
 	//Name, useful for debugging
 	String name;
 
@@ -51,19 +53,27 @@ public class Material {
 		specularExponent = se;
 	}
 
-	public void setReflective(double r) {
+	public void setReflective(double r, Vector tint) {
 		if (!Util.isBetweenInc(r, 0, 1)) throw new IllegalArgumentException("Reflection coefficient must be a value between 0 and 1 inclusive"); 
 
 		isReflective = true;
 		reflectionCoefficient = r;
+		reflectRefractTint = tint;
 	}
 	
-	public void setRefractive(double r) {
+	public void setRefractive(double r, Vector tint) {
 		if (!Util.isBetweenInc(r, 1, 38.6)) throw new IllegalArgumentException("Refractive index must be a value between 1 and 38.6 inclusive"); 
 
 		isRefractive = true;
 		refractiveIndex = r;
+		reflectRefractTint = tint;
 	}
+
+	public Vector getReflectRefractTint() {
+		return reflectRefractTint;
+	}
+
+
 
 	static Material RED = new Material("RED");
 	static Material GREEN = new Material("GREEN");
@@ -76,6 +86,10 @@ public class Material {
 	static Material WATER = new Material("WATER");
 	static Material GLASS = new Material("GLASS");
 	static Material DIAMOND = new Material("DIAMOND");
+	static Material SAPPHIRE = new Material("SAPPHIRE");
+	static Material EMERALD = new Material("EMERALD");
+	static Material RUBY = new Material("RUBY");
+
 	
 	static {
 		RED.setAmbient(new Vector(1,0,0));
@@ -98,16 +112,18 @@ public class Material {
 		BLACK.setDiffuse(new Vector(0.2,0.2,0.2));
 		BLACK.setSpecular(new Vector(0.7,0.7,0.7), 200);
 
-		MIRROR.setReflective(0.8);
+		MIRROR.setReflective(0.8, new Vector(1,1,1));
 		
 		TEXTURE.setAmbient(new Vector(1,1,1));
 		TEXTURE.setDiffuse(new Vector(1,1,1));
 		
-		WATER.setRefractive(1.333);
+		WATER.setRefractive(1.333, new Vector(1,1,1));
+		GLASS.setRefractive(1.52, new Vector(1,1,1));
+		DIAMOND.setRefractive(2.42, new Vector(1,1,1));
+		SAPPHIRE.setRefractive(1.765, new Vector(0.059,0.322,0.729));
+		EMERALD.setRefractive(1.575, new Vector(0.314,0.784,0.471));
+		RUBY.setRefractive(1.765, new Vector(0.878,0.067,0.373));
 		
-		GLASS.setRefractive(1.52);
-		
-		DIAMOND.setRefractive(2.42);
 	}
 
 	@Override
@@ -118,11 +134,11 @@ public class Material {
 	public Material clone() {
 
 		Material clone = new Material(this.name);
-		if (isAmbient) clone.setAmbient(this.ambient);
-		if (isDiffuse) clone.setDiffuse(this.diffuse);
-		if (isSpecular) clone.setSpecular(this.specular, this.specularExponent);
-		if (isReflective) clone.setReflective(this.reflectionCoefficient);
-		if (isRefractive) clone.setRefractive(this.refractiveIndex);
+		if (isAmbient) clone.setAmbient(this.ambient.clone());
+		if (isDiffuse) clone.setDiffuse(this.diffuse.clone());
+		if (isSpecular) clone.setSpecular(this.specular.clone(), this.specularExponent);
+		if (isReflective) clone.setReflective(this.reflectionCoefficient, this.reflectRefractTint.clone());
+		if (isRefractive) clone.setRefractive(this.refractiveIndex, this.reflectRefractTint.clone());
 
 		return clone;
 
