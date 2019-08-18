@@ -12,9 +12,9 @@ import javax.imageio.ImageIO;
 public class RayTracer {
 
 	private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
-
+	
 	public static void main(String args[]) throws InterruptedException, IOException {
-
+		
 		Settings settings = new Settings();
 
 		boolean getUserInput = Input.getBoolean("Choose custom inputs?");
@@ -347,9 +347,11 @@ public class RayTracer {
 			e.printStackTrace();
 		}
 
+		int processors = 1;
+		
 		if (settings.isMultithreading()) {
 
-			int processors = Runtime.getRuntime().availableProcessors();
+			processors = Runtime.getRuntime().availableProcessors();
 
 			int colsPerThread = settings.getWindowX()/processors;
 
@@ -387,8 +389,16 @@ public class RayTracer {
 		long endTime = System.currentTimeMillis();
 		long elapsedTime = endTime - startTime;
 
+		System.out.println();
 		System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
-
+		
+		int totalPixels = settings.getWindowX() * settings.getWindowY();
+		int totalSubpixels = totalPixels * settings.getTotalSubPixels();
+		
+		System.out.println("Total pixels: " + totalPixels);
+		System.out.println("Pixels per second (per thread): " + totalPixels / elapsedTime + " (" + ((totalPixels / elapsedTime)/processors) + ")");
+		System.out.println("Subpixels per second (per thread): " + totalSubpixels / elapsedTime + " (" + ((totalSubpixels / elapsedTime)/processors) + ")");
+		
 	}
 
 	public static void rayTrace(int threadNum, BufferedImage img, int startCol, int endCol, Settings settings, Scene scene) {

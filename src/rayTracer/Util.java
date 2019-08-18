@@ -200,4 +200,17 @@ public class Util {
 		
 	}
 	
+	public static double Schlick(Vector incident, Vector normal, double ior) {
+		
+		double rNaught = (1-ior)/(1+ior);
+		rNaught *= rNaught;
+		
+		double cosTheta = incident.dotProduct(normal);
+		
+		double rTheta = rNaught + (1 - rNaught)*Math.pow((1 - cosTheta),5);
+		
+		return rTheta;
+		
+	}
+	
 }
