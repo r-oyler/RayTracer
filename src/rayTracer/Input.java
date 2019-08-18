@@ -8,6 +8,10 @@ public class Input {
 		
 		Settings s = new Settings();
 		
+		boolean multithreading = getBoolean("Enable multithreading?");
+		
+		s.setMultithreading(multithreading);
+		
 		int windowX = getInt("Window width", 1366, 1, Integer.MAX_VALUE);
 		int windowY = getInt("Window height", 768, 1, Integer.MAX_VALUE);
 		
@@ -22,7 +26,7 @@ public class Input {
 		
 		s.setSSColRowMax(ssCols, ssRows);
 		
-		int maxRecursionDepth = getInt("Maximum recursion depth", 1, 1, Integer.MAX_VALUE);
+		int maxRecursionDepth = getInt("Maximum recursion depth", 7, 1, Integer.MAX_VALUE);
 		
 		s.setMaxRecursionDepth(maxRecursionDepth);
 		
@@ -114,6 +118,19 @@ public class Input {
 		}
 		
 		return (i == 0);
+		
+	}
+	
+	public static String getString(String message, String defaultValue) {
+		
+		String s = JOptionPane.showInputDialog(null, message + "\n(String)", defaultValue);
+		
+		if (s == null) {
+			System.out.println("Exiting");
+			System.exit(0);
+		}
+		
+		return s;
 		
 	}
 	

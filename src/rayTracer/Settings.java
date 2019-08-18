@@ -2,6 +2,8 @@ package rayTracer;
 
 public class Settings {
 
+	boolean multithreading = false;
+	
 	// Dimensions of image
 	int windowX = 640;
 	int windowY = 480;
@@ -55,6 +57,14 @@ public class Settings {
 		this.rowMargin = 1f/(2*ssRowMax);
 	}
 	
+	public boolean isMultithreading() {
+		return multithreading;
+	}
+
+	public void setMultithreading(boolean multithreading) {
+		this.multithreading = multithreading;
+	}
+
 	public int getWindowX() {
 		return windowX;
 	}
@@ -134,6 +144,7 @@ public class Settings {
 	public Settings clone() {
 		
 		Settings clone = new Settings();
+		clone.setMultithreading(this.multithreading);
 		clone.setWindowXY(this.getWindowX(),this.getWindowY());
 		clone.setFov(this.getFov());
 		clone.setSSColRowMax(this.getSSColumnMax(), this.getSSRowMax());

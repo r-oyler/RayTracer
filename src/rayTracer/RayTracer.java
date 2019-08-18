@@ -15,9 +15,6 @@ public class RayTracer {
 
 	public static void main(String args[]) throws InterruptedException, IOException {
 
-		// Toggle for using multi-threading
-		boolean multiThreading = false;
-
 		Settings settings = new Settings();
 
 		boolean getUserInput = Input.getBoolean("Choose custom inputs?");
@@ -28,6 +25,7 @@ public class RayTracer {
 
 		else {
 
+			settings.setMultithreading(true);
 			// Dimensions of image
 			settings.setWindowXY(1366, 768);
 			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
@@ -50,6 +48,8 @@ public class RayTracer {
 		// The color that is seen when a ray doesn't hit an object;
 		scene.setBackgroundColor(new Vector(20f,0f,20f));;
 
+		String outputFileName = Input.getString("Output file name", "saved.png");
+		
 		// Switch statement to have multiple scene setups
 		int sceneNum = Input.getInt("Scene number", 10, 0, 10);
 		switch(sceneNum) {
@@ -289,7 +289,7 @@ public class RayTracer {
 			e.printStackTrace();
 		}
 
-		if (multiThreading) {
+		if (settings.isMultithreading()) {
 
 			int processors = Runtime.getRuntime().availableProcessors();
 
@@ -320,7 +320,7 @@ public class RayTracer {
 
 		}
 
-		File outputfile = new File("saved.png");
+		File outputfile = new File(outputFileName);
 		ImageIO.write(img, "png", outputfile);
 
 		Desktop dt = Desktop.getDesktop();
