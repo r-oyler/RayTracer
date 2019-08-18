@@ -89,7 +89,13 @@ public class Material {
 	static Material SAPPHIRE = new Material("SAPPHIRE");
 	static Material EMERALD = new Material("EMERALD");
 	static Material RUBY = new Material("RUBY");
-
+	
+	static Material BRASS = new Material("BRASS");
+	static Material BRONZE = new Material("BRONZE");
+	static Material CHROME = new Material("CHROME");
+	static Material COPPER = new Material("COPPER");
+	static Material GOLD = new Material("GOLD");
+	static Material SILVER = new Material("SILVER");
 	
 	static {
 		RED.setAmbient(new Vector(1,0,0));
@@ -123,6 +129,36 @@ public class Material {
 		SAPPHIRE.setRefractive(1.765, new Vector(0.059,0.322,0.729));
 		EMERALD.setRefractive(1.575, new Vector(0.314,0.784,0.471));
 		RUBY.setRefractive(1.765, new Vector(0.878,0.067,0.373));
+		
+		BRASS.setDiffuse(new Vector(0.329412,0.223529,0.027451));
+		BRASS.setAmbient(new Vector(0.780392,0.568627,0.113725));
+		BRASS.setSpecular(new Vector(0.992157,0.941176,0.807843), 27.89743616);
+		BRASS.setReflective(0.15, new Vector(0.992157,0.941176,0.807843));
+		
+		BRONZE.setDiffuse(new Vector(0.2125,0.1275,0.054));
+		BRONZE.setAmbient(new Vector(0.780392,0.568627,0.113725));
+		BRONZE.setSpecular(new Vector(0.992157,0.941176,0.807843), 27.89743616);
+		BRONZE.setReflective(0.15, new Vector(0.992157,0.941176,0.807843));
+		
+		CHROME.setDiffuse(new Vector(0.329412,0.223529,0.027451));
+		CHROME.setAmbient(new Vector(0.780392,0.568627,0.113725));
+		CHROME.setSpecular(new Vector(0.992157,0.941176,0.807843), 27.89743616);
+		CHROME.setReflective(0.15, new Vector(0.992157,0.941176,0.807843));
+		
+		COPPER.setDiffuse(new Vector(0.329412,0.223529,0.027451));
+		COPPER.setAmbient(new Vector(0.780392,0.568627,0.113725));
+		COPPER.setSpecular(new Vector(0.992157,0.941176,0.807843), 27.89743616);
+		COPPER.setReflective(0.15, new Vector(0.992157,0.941176,0.807843));
+		
+		GOLD.setDiffuse(new Vector(0.329412,0.223529,0.027451));
+		GOLD.setAmbient(new Vector(0.780392,0.568627,0.113725));
+		GOLD.setSpecular(new Vector(0.992157,0.941176,0.807843), 27.89743616);
+		GOLD.setReflective(0.15, new Vector(0.992157,0.941176,0.807843));
+		
+		SILVER.setDiffuse(new Vector(0.329412,0.223529,0.027451));
+		SILVER.setAmbient(new Vector(0.780392,0.568627,0.113725));
+		SILVER.setSpecular(new Vector(0.992157,0.941176,0.807843), 27.89743616);
+		SILVER.setReflective(0.15, new Vector(0.992157,0.941176,0.807843));
 		
 	}
 

@@ -51,7 +51,7 @@ public class RayTracer {
 		String outputFileName = Input.getString("Output file name", "saved.png");
 		
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 11, 0, 11);
+		int sceneNum = Input.getInt("Scene number", 12, 0, 12);
 		switch(sceneNum) {
 
 		case 0:
@@ -307,6 +307,32 @@ public class RayTracer {
 			break;
 		}
 		
+		case 12:{
+
+			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
+
+			p0.addTextureMap("gridred.png");
+			p1.addTextureMap("coloredgrid.png");
+			p2.addTextureMap("gridblue.png");
+
+			Sphere s0 = new Sphere(new Vector(5,1,1), Material.BRASS, 0.5);
+			
+			Vector camPos = new Vector(4,1,5);
+			Vector lightPos = new Vector(4,4,3);
+
+			scene.addObject(p0);
+			scene.addObject(p1);
+			scene.addObject(p2);
+			scene.addObject(s0);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
+
+			break;
+		}
+		
 		}
 
 		long startTime = System.currentTimeMillis();
@@ -332,7 +358,7 @@ public class RayTracer {
 				int startCol = i * colsPerThread;
 				int endCol = (i+1) * colsPerThread;
 
-				RayTraceRunnable runnable = new RayTraceRunnable(img, startCol, endCol, settings.clone(), scene.clone());
+				RayTraceRunnable runnable = new RayTraceRunnable(i, img, startCol, endCol, settings.clone(), scene.clone());
 				Thread t = new Thread(runnable);
 				t.start();
 				arrThreads.add(t);
@@ -348,7 +374,7 @@ public class RayTracer {
 
 		else {
 
-			rayTrace(img, 0, settings.getWindowX(), settings, scene);
+			rayTrace(0, img, 0, settings.getWindowX(), settings, scene);
 
 		}
 
@@ -365,8 +391,10 @@ public class RayTracer {
 
 	}
 
-	public static void rayTrace(BufferedImage img, int startCol, int endCol, Settings settings, Scene scene) {
+	public static void rayTrace(int threadNum, BufferedImage img, int startCol, int endCol, Settings settings, Scene scene) {
 
+		int lastPercent = 0;
+		
 		for (int column = startCol; column < endCol; column++) {
 			for (int row = 0; row < settings.getWindowY(); row++) {
 
@@ -443,9 +471,13 @@ public class RayTracer {
 
 			}
 
-			//			double percent = ((double)column*100)/((double)settings.getWindowX());
-			//			System.out.println(percent + "%");
-
+			int percent = (int) (((double)(column-startCol)*100)/((double)(endCol-startCol)));
+			
+			if (percent > lastPercent) {
+				System.out.println("Thread " + threadNum + ": " + percent + "%");
+				lastPercent = percent;
+			}
+			
 		}
 
 	}
@@ -630,10 +662,6 @@ public class RayTracer {
 				
 				
 			}
-
-			//illumination = ambient;
-			//illumination = totalDiffuse;
-			//illumination = totalSpecular;
 
 			payload.setColor(illumination);
 			return info.getTime();

@@ -43,6 +43,9 @@ public class IntersectInfo{
 	public void setMaterial(Material material) {
 		this.material = material;
 	}
+	public void setHasNoUV() {
+		this.hasUV = false;
+	}
 	public Vector getUVcolor() {
 		return uvColor;
 	}

@@ -12,8 +12,8 @@ public class Input {
 		
 		s.setMultithreading(multithreading);
 		
-		int windowX = getInt("Window width", 1366, 1, Integer.MAX_VALUE);
-		int windowY = getInt("Window height", 768, 1, Integer.MAX_VALUE);
+		int windowX = getInt("Window width", 1366, 1, 32_767);
+		int windowY = getInt("Window height", 768, 1, 32_767);
 		
 		s.setWindowXY(windowX, windowY);
 		
