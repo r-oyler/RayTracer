@@ -51,7 +51,7 @@ public class RayTracer {
 		String outputFileName = Input.getString("Output file name", "saved.png");
 		
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 12, 0, 12);
+		int sceneNum = Input.getInt("Scene number", 13, 0, 13);
 		switch(sceneNum) {
 
 		case 0:
@@ -330,6 +330,21 @@ public class RayTracer {
 
 			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
 
+			break;
+		}
+		
+		case 13:{
+			
+			InfCylinder c = new InfCylinder(new Vector(0,0,0), Material.BLUE, new Vector(1,0,0), 1);
+			
+			Vector camPos = new Vector(3,3,5);
+			Vector lightPos = new Vector(0,5,5);
+			
+			scene.addObject(c);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+			
 			break;
 		}
 		

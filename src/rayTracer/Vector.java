@@ -33,6 +33,7 @@ public class Vector {
 
 	}
 
+	// B - A = Vector from A to B
 	Vector minus(Vector v) {
 
 		if(this.dim != v.dim) throw new IllegalArgumentException("Vector dimension mismatch.");
