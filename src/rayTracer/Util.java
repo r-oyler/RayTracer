@@ -213,4 +213,14 @@ public class Util {
 		
 	}
 	
+	public static Vector quadraticFormula(double a, double b, double c) {
+		
+		double discriminant = b*b - 4*a*c;
+		
+		double x1 = (-b -Math.sqrt(discriminant))/(2*a);
+		double x2 = (-b +Math.sqrt(discriminant))/(2*a);
+		
+		return new Vector(x1,x2);
+	}
+	
 }

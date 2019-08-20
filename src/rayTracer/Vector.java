@@ -94,6 +94,10 @@ public class Vector {
 
 		return prod;
 	}
+	
+	double squared() {
+		return this.dotProduct(this);
+	}
 
 	Vector multComponents(Vector v) {
 

@@ -12,9 +12,9 @@ import javax.imageio.ImageIO;
 public class RayTracer {
 
 	private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
-	
+
 	public static void main(String args[]) throws InterruptedException, IOException {
-		
+
 		Settings settings = new Settings();
 
 		boolean getUserInput = Input.getBoolean("Choose custom inputs?");
@@ -25,7 +25,7 @@ public class RayTracer {
 
 		else {
 
-			settings.setMultithreading(true);
+			settings.setMultithreading(false);
 			// Dimensions of image
 			settings.setWindowXY(1366, 768);
 			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
@@ -49,9 +49,9 @@ public class RayTracer {
 		scene.setBackgroundColor(new Vector(20f,0f,20f));;
 
 		String outputFileName = Input.getString("Output file name", "saved.png");
-		
+
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 13, 0, 13);
+		int sceneNum = Input.getInt("Scene number", 14, 0, 14);
 		switch(sceneNum) {
 
 		case 0:
@@ -248,7 +248,7 @@ public class RayTracer {
 
 			break;
 		}
-		
+
 		case 10:{
 
 			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
@@ -289,7 +289,7 @@ public class RayTracer {
 			Sphere s1 = new Sphere(new Vector(3,1,1), Material.SAPPHIRE, 0.5);
 			Sphere s2 = new Sphere(new Vector(5,1,1), Material.EMERALD, 0.5);
 			Sphere s3 = new Sphere(new Vector(7,1,1), Material.RUBY, 0.5);
-			
+
 			Vector camPos = new Vector(4,1,5);
 			Vector lightPos = new Vector(4,4,3);
 
@@ -306,7 +306,7 @@ public class RayTracer {
 
 			break;
 		}
-		
+
 		case 12:{
 
 			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
@@ -318,7 +318,7 @@ public class RayTracer {
 			p2.addTextureMap("gridblue.png");
 
 			Sphere s0 = new Sphere(new Vector(5,1,1), Material.BRASS, 0.5);
-			
+
 			Vector camPos = new Vector(4,1,5);
 			Vector lightPos = new Vector(4,4,3);
 
@@ -332,22 +332,38 @@ public class RayTracer {
 
 			break;
 		}
-		
+
 		case 13:{
-			
+
 			InfCylinder c = new InfCylinder(new Vector(0,0,0), Material.BLUE, new Vector(1,0,0), 1);
-			
-			Vector camPos = new Vector(3,3,5);
-			Vector lightPos = new Vector(0,5,5);
-			
+
+			Vector camPos = new Vector(2,2,5);
+			Vector lightPos = new Vector(0,0,5);
+
 			scene.addObject(c);
 			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-			
+
 			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
-			
+
 			break;
 		}
-		
+
+		case 14:{
+
+			Cylinder c = new Cylinder(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 1);
+
+			Vector camPos = new Vector(-3,0,4);
+			Vector lightPos = new Vector(3,2,5);
+
+			scene.addObject(c);
+			scene.addLight(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+			break;
+
+		}
+
 		}
 
 		long startTime = System.currentTimeMillis();
@@ -363,7 +379,7 @@ public class RayTracer {
 		}
 
 		int processors = 1;
-		
+
 		if (settings.isMultithreading()) {
 
 			processors = Runtime.getRuntime().availableProcessors();
@@ -406,20 +422,20 @@ public class RayTracer {
 
 		System.out.println();
 		System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
-		
+
 		int totalPixels = settings.getWindowX() * settings.getWindowY();
 		int totalSubpixels = totalPixels * settings.getTotalSubPixels();
-		
+
 		System.out.println("Total pixels: " + totalPixels);
 		System.out.println("Pixels per second (per thread): " + totalPixels / elapsedTime + " (" + ((totalPixels / elapsedTime)/processors) + ")");
 		System.out.println("Subpixels per second (per thread): " + totalSubpixels / elapsedTime + " (" + ((totalSubpixels / elapsedTime)/processors) + ")");
-		
+
 	}
 
 	public static void rayTrace(int threadNum, BufferedImage img, int startCol, int endCol, Settings settings, Scene scene) {
 
 		int lastPercent = 0;
-		
+
 		for (int column = startCol; column < endCol; column++) {
 			for (int row = 0; row < settings.getWindowY(); row++) {
 
@@ -472,10 +488,10 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 
-//						if (column == 683 && row == 384) {
-//							System.out.println();
-//						}
-						
+						if (column == 680 && row == 380) {
+							System.out.println();
+						}
+
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
@@ -497,12 +513,12 @@ public class RayTracer {
 			}
 
 			int percent = (int) (((double)(column-startCol)*100)/((double)(endCol-startCol)));
-			
+
 			if (percent > lastPercent) {
 				System.out.println("Thread " + threadNum + ": " + percent + "%");
 				lastPercent = percent;
 			}
-			
+
 		}
 
 	}
@@ -633,59 +649,59 @@ public class RayTracer {
 				reflection = reflectionPayload.Color.timesConst(info.getMaterial().reflectionCoefficient);
 
 				reflection = reflection.multComponents(info.getMaterial().getReflectRefractTint());
-				
+
 				illumination = reflection.plus(illumination.timesConst(1-info.getMaterial().reflectionCoefficient));
 
 			}
-			
+
 			if (info.getMaterial().isRefractive) {
-				
+
 				double kReflect = Util.fresnel(ray.direction, info.getNormal(), info.getMaterial().refractiveIndex);
-				
+
 				boolean outside = ray.direction.dotProduct(info.getNormal()) < 0;
-				
+
 				Vector bias = info.getNormal().timesConst(settings.getBias());
-				
+
 				// compute refraction if it is not a case of total internal reflection
 				if (kReflect < 1) {
-					
+
 					Vector refractionDirection = Util.refract(ray.direction, info.getNormal(), info.getMaterial().refractiveIndex);
-					
+
 					Vector refractionRayOrigin = outside ? info.getHitPoint().minus(bias) : info.getHitPoint().plus(bias);
-					
+
 					Ray refractionRay = new Ray(refractionRayOrigin, refractionDirection.normalize());
-					
+
 					Payload refractionPayload = new Payload();
 					refractionPayload.setNumBounces(payload.numBounces+1);
-					
+
 					CastRay(refractionRay, refractionPayload, settings, scene);
-					
+
 					Vector refraction = refractionPayload.Color.timesConst(1-kReflect);
-					
+
 					refraction = refraction.multComponents(info.getMaterial().getReflectRefractTint());
-					
+
 					illumination = illumination.plus(refraction);
-					
+
 				}
-				
+
 				Vector reflectionDirection = Util.reflect(ray.direction, info.getNormal());
-				
+
 				Vector reflectionRayOrigin = outside ? info.getHitPoint().plus(bias) : info.getHitPoint().minus(bias);
-				
+
 				Ray reflectionRay = new Ray(reflectionRayOrigin, reflectionDirection);
-				
+
 				Payload reflectionPayload = new Payload();
 				reflectionPayload.setNumBounces(payload.numBounces+1);
-				
+
 				CastRay(reflectionRay, reflectionPayload, settings, scene);
-				
+
 				Vector reflection = reflectionPayload.Color.timesConst(kReflect);
-				
+
 				reflection = reflection.multComponents(info.getMaterial().getReflectRefractTint());
-				
+
 				illumination = illumination.plus(reflection);
-				
-				
+
+
 			}
 
 			payload.setColor(illumination);
