@@ -107,7 +107,7 @@ public class Sphere extends MatObject {
 	}
 	
 	@Override
-	public MatObject clone() {
+	public Sphere clone() {
 				
 		Sphere clone = new Sphere(this.p0.clone(),this.material.clone(),this.radius);
 	

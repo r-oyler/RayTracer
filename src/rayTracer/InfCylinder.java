@@ -84,7 +84,7 @@ public class InfCylinder extends MatObject {
 	}
 
 	@Override
-	public MatObject clone() {
+	public InfCylinder clone() {
 		InfCylinder clone = new InfCylinder(this.p0.clone(), this.material.clone(), this.direction.clone(), this.radius);
 		return clone;
 	}

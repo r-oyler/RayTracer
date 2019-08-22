@@ -155,7 +155,7 @@ public class Triangle extends MatObject {
 	}
 
 	@Override
-	public MatObject clone() {
+	public Triangle clone() {
 		return new Triangle(this.p0.clone(), this.p1.clone(), this.p2.clone(), this.material.clone());
 	}
 

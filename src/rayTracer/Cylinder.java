@@ -86,7 +86,7 @@ public class Cylinder extends MatObject {
 	}
 
 	@Override
-	public MatObject clone() {
+	public Cylinder clone() {
 		Cylinder clone = new Cylinder(this.p0.clone(), this.material.clone(), this.endB.clone(), radius);
 		return clone;
 	}

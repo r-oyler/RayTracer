@@ -69,7 +69,7 @@ public class AABB extends MatObject {
 	}
 
 	@Override
-	public MatObject clone() {
+	public AABB clone() {
 		AABB clone = new AABB(this.p0.clone(),this.material.clone(),this.boxSize.clone());
 		clone.transform = this.transform;
 		return clone;

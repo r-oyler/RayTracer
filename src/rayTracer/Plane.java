@@ -122,7 +122,7 @@ public class Plane extends MatObject {
 	}
 	
 	@Override
-	public MatObject clone() {
+	public Plane clone() {
 		Plane clone = new Plane(this.p0.clone(),this.material.clone(),this.normal.clone());
 	
 		if (this.hasTextureMap) {

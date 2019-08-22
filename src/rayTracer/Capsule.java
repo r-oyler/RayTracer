@@ -100,7 +100,7 @@ public class Capsule extends MatObject {
 	}
 
 	@Override
-	public MatObject clone() {
+	public Capsule clone() {
 		Capsule clone = new Capsule(this.p0.clone(),this.material.clone(),this.p1.clone(),this.radius);
 		return clone;
 	}

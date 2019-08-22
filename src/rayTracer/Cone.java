@@ -115,7 +115,7 @@ public class Cone extends MatObject {
 	}
 
 	@Override
-	public MatObject clone() {
+	public Cone clone() {
 		Cone clone = new Cone(this.p0.clone(), this.material.clone(), this.endB.clone(), this.radiusA, this.radiusB);
 		return clone;
 	}

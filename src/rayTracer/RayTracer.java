@@ -51,7 +51,7 @@ public class RayTracer {
 		String outputFileName = Input.getString("Output file name", "saved.png");
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 8, 0, 16);
+		int sceneNum = Input.getInt("Scene number", 17, 0, 17);
 		switch(sceneNum) {
 
 		case 0:
@@ -405,6 +405,27 @@ public class RayTracer {
 			
 		}
 
+		case 17:{
+			
+			RoundedBox r = new RoundedBox(new Vector(0,0,0), Material.BLUE, new Vector(2,4,1), 0.5);
+			
+			Vector camPos = new Vector(0,0,15);
+			
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(45)).timesV(camPos.addDim(1)).dropDim();
+			
+			Vector lightPos = new Vector(0,0,15);
+			
+			scene.addObject(r);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+			r.rotateY(Util.degreeToRadian(0));
+			
+			break;
+			
+		}
+		
 		}
 
 		long startTime = System.currentTimeMillis();
@@ -529,10 +550,10 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 
-						if (column == 628 && row == 425) {
-							System.out.println();
-						}
-
+//						if (column == 1366/2 && row == 768/2) {
+//							System.out.print("");
+//						}
+						
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}

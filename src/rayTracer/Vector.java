@@ -32,6 +32,18 @@ public class Vector {
 		return new Vector(sum);
 
 	}
+	
+	Vector plus(double d) {
+		
+		double[] sum = new double[dim];
+
+		for(int i = 0; i<dim; i++) {
+			sum[i] = this.d[i]+d;
+		}
+
+		return new Vector(sum);
+		
+	}
 
 	// B - A = Vector from A to B
 	Vector minus(Vector v) {
@@ -48,6 +60,10 @@ public class Vector {
 
 	}
 
+	Vector negative() {
+		return this.timesConst(-1);
+	}
+	
 	Vector timesConst(double s) {
 
 		double[] prod = new double[dim];
@@ -298,6 +314,82 @@ public class Vector {
 
 		return result;
 
+	}
+	
+	public Vector max(Vector v) {
+
+		if(this.dim != v.dim) throw new IllegalArgumentException("Vector dimension mismatch.");
+		
+		double[] d = new double[this.dim];
+		
+		for (int i = 0; i < this.dim; i++) {
+			d[i] = Math.max(this.d[i], v.d[i]);
+		}
+		
+		return new Vector(d);
+		
+	}
+
+	public Vector max(double d) {
+		
+		double[] d1 = new double[this.dim];
+		
+		for (int i = 0; i < this.dim; i++) {
+			d1[i] = Math.max(this.d[i], d);
+		}
+		
+		return new Vector(d1);
+		
+	}
+	
+	public double max() {
+		
+		double max = d[0];
+		
+		for (int i = 1; i < this.dim; i++) {
+			max = Math.max(this.d[i], max);
+		}
+		
+		return max;
+		
+	}
+	
+	public Vector min(Vector v) {
+
+		if(this.dim != v.dim) throw new IllegalArgumentException("Vector dimension mismatch.");
+		
+		double[] d = new double[this.dim];
+		
+		for (int i = 0; i < this.dim; i++) {
+			d[i] = Math.min(this.d[i], v.d[i]);
+		}
+		
+		return new Vector(d);
+		
+	}
+	
+	public Vector min(double d) {
+		
+		double[] d1 = new double[this.dim];
+		
+		for (int i = 0; i < this.dim; i++) {
+			d1[i] = Math.min(this.d[i], d);
+		}
+		
+		return new Vector(d1);
+		
+	}
+	
+	public double min() {
+		
+		double max = d[0];
+		
+		for (int i = 1; i < this.dim; i++) {
+			max = Math.min(this.d[i], max);
+		}
+		
+		return max;
+		
 	}
 	
 	public String toString() {
