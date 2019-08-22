@@ -205,7 +205,7 @@ public class Vector {
 
 	}
 
-	// Add dimension to vector, new dimension is given 0
+	// Add dimension to vector, new dimension is given x
 	Vector addDim(double x) {
 
 		double[] d = new double[this.dim+1];

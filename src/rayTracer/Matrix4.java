@@ -67,13 +67,13 @@ public class Matrix4 {
 	public static Matrix4 scaleMatrix(double xScale, double yScale, double zScale) {
 		
 		double[][] d = new double[][]{
-			{1/xScale,0,0,0},
-			{0,1/yScale,0,0},
-			{0,0,1/zScale,0},
+			{xScale,0,0,0},
+			{0,yScale,0,0},
+			{0,0,zScale,0},
 			{0,0,0,1}
 		};
 		
-		return new Matrix4(d	);
+		return new Matrix4(d);
 		
 	}
 	
@@ -233,7 +233,8 @@ public class Matrix4 {
 	}
 
 	public Matrix4 clone() {
-		return new Matrix4(this.d);
+				
+		return new Matrix4(Util.cloneDouble2d(this.d));
 	}
 
 }

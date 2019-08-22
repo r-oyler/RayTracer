@@ -14,7 +14,7 @@ public class RayTracer {
 	private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 
 	public static void main(String args[]) throws InterruptedException, IOException {
-
+		
 		Settings settings = new Settings();
 
 		boolean getUserInput = Input.getBoolean("Choose custom inputs?");
@@ -51,7 +51,7 @@ public class RayTracer {
 		String outputFileName = Input.getString("Output file name", "saved.png");
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 16, 0, 16);
+		int sceneNum = Input.getInt("Scene number", 8, 0, 16);
 		switch(sceneNum) {
 
 		case 0:
@@ -206,18 +206,27 @@ public class RayTracer {
 
 		case 8:{
 
-			AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
-
+			AABB aabb = new AABB(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
+			AABB aabb2 = new AABB(new Vector(2,0,0), Material.BLUE, new Vector(0.5,0.5,0.5));
+			AABB aabb3 = new AABB(new Vector(0,2,0), Material.YELLOW, new Vector(0.5,0.5,0.5));
+			AABB aabb4 = new AABB(new Vector(0,0,2), Material.GREEN, new Vector(0.5,0.5,0.5));
+			
+			
 			Vector camPos = new Vector(8,8,8);
-			Vector lightPos = camPos;
+			Vector lightPos = new Vector(0,8,0);
 
 			scene.addObject(aabb);
+			scene.addObject(aabb2);
+			scene.addObject(aabb3);
+			scene.addObject(aabb4);
 			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
 
 			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
 
-			//			aabb.rotateX(Util.degreeToRadian(1));
-
+			aabb2.rotateY(Util.degreeToRadian(45));
+			aabb3.rotateX(Util.degreeToRadian(45));
+			aabb4.rotateZ(Util.degreeToRadian(45));
+			
 			break;
 		}
 
@@ -520,9 +529,9 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 
-//						if (column == 680 && row == 380) {
-//							System.out.println();
-//						}
+						if (column == 628 && row == 425) {
+							System.out.println();
+						}
 
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();

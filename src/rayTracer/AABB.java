@@ -48,9 +48,10 @@ public class AABB extends MatObject {
 		normal = normal.multComponents(t1xyz.step(t1yzx));
 		normal = normal.multComponents(t1xyz.step(t1zxy));
 		
+		normal = boxToWorld.timesV(normal.addDim(0)).dropDim();
+		
 		info.setTime(tN);
 		Vector hitPoint = ray.atTime(tN);
-		hitPoint = boxToWorld.timesV(hitPoint.addDim(0)).dropDim();
 		info.setHitPoint(hitPoint);
 		
 		info.setNormal(normal);
@@ -69,7 +70,9 @@ public class AABB extends MatObject {
 
 	@Override
 	public MatObject clone() {
-		return new AABB(this.p0.clone(),this.material.clone(),this.boxSize.clone());
+		AABB clone = new AABB(this.p0.clone(),this.material.clone(),this.boxSize.clone());
+		clone.transform = this.transform;
+		return clone;
 	}
 
 }

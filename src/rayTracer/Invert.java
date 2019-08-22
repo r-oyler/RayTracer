@@ -6,7 +6,7 @@ public class Invert {
 
 	static Matrix4 invert(Matrix4 m) {
 		
-		double[][] a = m.d;
+		double[][] a = Util.cloneDouble2d(m.d);
 
 		int n = a[0].length;
 		double x[][] = new double[n][n];

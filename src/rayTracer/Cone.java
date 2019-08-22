@@ -13,7 +13,7 @@ public class Cone extends MatObject {
 		this.radiusB = radiusB;
 	}
 
-	@Override
+	// http://iquilezles.org/www/articles/intersectors/intersectors.htm
 	boolean Intersect(Ray ray, IntersectInfo info) {
 
 		Vector endA = this.p0;
