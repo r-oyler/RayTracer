@@ -25,7 +25,7 @@ public class RayTracer {
 
 		else {
 
-			settings.setMultithreading(false);
+			settings.setMultithreading(true);
 			// Dimensions of image
 			settings.setWindowXY(1366, 768);
 			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
@@ -51,7 +51,7 @@ public class RayTracer {
 		String outputFileName = Input.getString("Output file name", "saved.png");
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 15, 0, 15);
+		int sceneNum = Input.getInt("Scene number", 16, 0, 16);
 		switch(sceneNum) {
 
 		case 0:
@@ -353,10 +353,10 @@ public class RayTracer {
 			Cylinder c = new Cylinder(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 1);
 
 			Vector camPos = new Vector(-3,0,4);
-			Vector lightPos = new Vector(3,2,5);
+			Vector lightPos = new Vector(-3,0,4);
 
 			scene.addObject(c);
-			scene.addLight(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
 
 			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
 
@@ -369,6 +369,22 @@ public class RayTracer {
 			Capsule c = new Capsule(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 1);
 
 			Vector camPos = new Vector(2,2,5);
+			Vector lightPos = new Vector(0,0,5);
+
+			scene.addObject(c);
+			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+			break;
+			
+		}
+		
+		case 16:{
+			
+			Cone c = new Cone(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 0.5, 1);
+
+			Vector camPos = new Vector(-3,0,5);
 			Vector lightPos = new Vector(0,0,5);
 
 			scene.addObject(c);

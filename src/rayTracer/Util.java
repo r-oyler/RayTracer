@@ -200,6 +200,7 @@ public class Util {
 		
 	}
 	
+	// Unsure if correct
 	public static double Schlick(Vector incident, Vector normal, double ior) {
 		
 		double rNaught = (1-ior)/(1+ior);
@@ -221,6 +222,12 @@ public class Util {
 		double x2 = (-b +Math.sqrt(discriminant))/(2*a);
 		
 		return new Vector(x1,x2);
+	}
+	
+	public static double inverseSqrt(double d) {
+		
+		return 1/Math.sqrt(d);
+		
 	}
 	
 }
