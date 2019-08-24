@@ -483,14 +483,9 @@ public class RayTracer {
 
 				processors = Runtime.getRuntime().availableProcessors();
 
-				int colsPerThread = settings.getWindowX()/processors;
-
 				for (int i = 0; i < processors; i++) {
 
-					int startCol = i * colsPerThread;
-					int endCol = (i+1) * colsPerThread;
-
-					RayTraceRunnable runnable = new RayTraceRunnable(i, img, startCol, endCol, settings.clone(), scene.clone());
+					RayTraceRunnable runnable = new RayTraceRunnable(i, img, i, settings.getWindowX(), processors, settings.clone(), scene.clone());
 					Thread t = new Thread(runnable);
 					t.start();
 					arrThreads.add(t);
@@ -506,7 +501,7 @@ public class RayTracer {
 
 			else {
 
-				rayTrace(0, img, 0, settings.getWindowX(), settings, scene);
+				rayTrace(0, img, 0, settings.getWindowX(), 1, settings, scene);
 
 			}
 
@@ -554,11 +549,11 @@ public class RayTracer {
 		dt.open(new File(outputFileName + ".gif"));
 	}
 
-	public static void rayTrace(int threadNum, BufferedImage img, int startCol, int endCol, Settings settings, Scene scene) {
+	public static void rayTrace(int threadNum, BufferedImage img, int startCol, int endCol, int stepSize, Settings settings, Scene scene) {
 
 		int lastPercent = 0;
 
-		for (int column = startCol; column < endCol; column++) {
+		for (int column = startCol; column < endCol; column+= stepSize) {
 			for (int row = 0; row < settings.getWindowY(); row++) {
 
 				// Color of pixel, super samples are added to this
