@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.imageio.stream.FileImageOutputStream;
+import javax.imageio.stream.ImageOutputStream;
 
 public class RayTracer {
 
@@ -41,457 +43,515 @@ public class RayTracer {
 
 		}
 
-		Scene scene = new Scene();
+		Scene scene;
 
-		// The ambient light that is cast on every object
-		scene.setAmbientLight(new Vector(40f,40f,40f));
-		// The color that is seen when a ray doesn't hit an object;
-		scene.setBackgroundColor(new Vector(20f,0f,20f));;
-
-		String outputFileName = Input.getString("Output file name", "saved.png");
+		String outputFileName = Input.getString("Output file name", "saved");
+		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 17, 0, 17);
-		switch(sceneNum) {
+		int sceneNum = Input.getInt("Scene number", 18, 0, 18);
 
-		case 0:
-		{
-			AABB aabb = new AABB(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
+		int totalSteps = 10;
+		double deltaTperStep = 1.0/10.0; 
 
-			Vector camPos = new Vector(0.5,0.5,3);
+		for(int step = 0; step <= totalSteps; step++ ){
 
-			scene.addObject(aabb);
-			scene.addLight(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+			double time = step*deltaTperStep;
 
-			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 1:
-		{
-			Sphere s = new Sphere(new Vector(0,0,0), Material.RED, 1);
-
-			Vector camPos = new Vector(0,0,3);
-			Vector ligPos = new Vector(2,0,3);
-
-			scene.addObject(s);
-			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
-
-			break;
-		}
-		case 2:
-		{
-			Vector p0 = new Vector(0,0,0);
-			Vector p1 = new Vector(1,0,0);
-			Vector p2 = p0.plus(new Vector(1,0,1).normalize());
-			Vector p3 = new Vector(p2.x(),Math.sqrt(6)/3f,(p0.z()+p1.z()+p2.z())/3);	
-
-			Vector centre = (p0.plus(p1).plus(p2).plus(p3)).divide(4);
-
-			Triangle t0 = new Triangle(p0,p1,p2, Material.RED);
-			Triangle t1 = new Triangle(p1,p0,p3, Material.GREEN);
-			Triangle t2 = new Triangle(p2,p1,p3, Material.BLUE);
-			Triangle t3 = new Triangle(p0,p2,p3, Material.YELLOW);
-
-			Vector camPos = new Vector(0,0,3);
-			Vector ligPos = camPos;
-
-			scene.addObject(t0);
-			scene.addObject(t1);
-			scene.addObject(t2);
-			scene.addObject(t3);
-
-			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, centre, new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 3:{
-
-			Vector p0 = new Vector(0,0,0);
-			Vector p1 = new Vector(0,1,0);
-			Vector p2 = new Vector(1,0,0);
-
-			Triangle t = new Triangle(p0,p1,p2, Material.RED);
-
-			Vector camPos = new Vector(0,0,1);
-			Vector ligPos = camPos;
-
-			scene.addObject(t);
-			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 4:{
-
-			Vector p0 = new Vector(0,0,0);
-			Vector n = new Vector(1,1,1);
-
-			Disk d = new Disk(p0, Material.RED, n, 1);
-
-			Vector camPos = new Vector(0,0,5);
-			Vector ligPos = camPos;
-
-			scene.addObject(d);
-			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, p0, new Vector(0,1,0)));
-			break;
-		}
-
-		case 5:{
-
-			Plane p0 = new Plane(new Vector(0,0,-1.1), Material.RED, new Vector(0,0,1));
-			Plane p1 = new Plane(new Vector(0,-1.1,0), Material.GREEN, new Vector(0,1,0));
-			Plane p2 = new Plane(new Vector(-1.1,0,0), Material.BLUE, new Vector(1,0,0));
-
-			Sphere s = new Sphere(new Vector(0,0,0), Material.MIRROR, 1);
-
-			Vector camPos = new Vector(1,1,4);
-			Vector ligPos = new Vector(0,5,0);
-
-			scene.addObject(p0);
-			scene.addObject(p1);
-			scene.addObject(p2);
-			scene.addObject(s);
-			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
-			break;
-		}
-
-		case 6:{
-
-			Sphere s = new Sphere(new Vector(0,0,0), Material.BLACK, 2);
-
-			s.addTextureMap("2k_moon.jpg");
-
-			Vector camPos = new Vector(4,4,4);
-			Vector ligPos = new Vector(0,0,4);
-
-			scene.addObject(s);
-			scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
-			scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
-			break;
-		}
-
-		case 7:{
-
-			AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
-			AABB aabb2 = new AABB(new Vector(5,1,1), Material.BLUE, new Vector(1,1,1));
-			AABB aabb3 = new AABB(new Vector(1,5,1), Material.YELLOW, new Vector(1,1,1));
-			AABB aabb4 = new AABB(new Vector(1,1,5), Material.GREEN, new Vector(1,1,1));
-
-			Vector camPos = new Vector(8,8,8);
-			Vector lightPos = camPos;
-
-			scene.addObject(aabb);
-			scene.addObject(aabb2);
-			scene.addObject(aabb3);
-			scene.addObject(aabb4);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 8:{
-
-			AABB aabb = new AABB(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
-			AABB aabb2 = new AABB(new Vector(2,0,0), Material.BLUE, new Vector(0.5,0.5,0.5));
-			AABB aabb3 = new AABB(new Vector(0,2,0), Material.YELLOW, new Vector(0.5,0.5,0.5));
-			AABB aabb4 = new AABB(new Vector(0,0,2), Material.GREEN, new Vector(0.5,0.5,0.5));
+			scene = new Scene();
 			
+			// The ambient light that is cast on every object
+			scene.setAmbientLight(new Vector(40f,40f,40f));
+			// The color that is seen when a ray doesn't hit an object;
+			scene.setBackgroundColor(new Vector(20f,0f,20f));;
 			
-			Vector camPos = new Vector(8,8,8);
-			Vector lightPos = new Vector(0,8,0);
+			switch(sceneNum) {
 
-			scene.addObject(aabb);
-			scene.addObject(aabb2);
-			scene.addObject(aabb3);
-			scene.addObject(aabb4);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
-
-			aabb2.rotateY(Util.degreeToRadian(45));
-			aabb3.rotateX(Util.degreeToRadian(45));
-			aabb4.rotateZ(Util.degreeToRadian(45));
-			
-			break;
-		}
-
-		case 9:{
-
-			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
-			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
-			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
-
-			p0.addTextureMap("gridred.png");
-			p1.addTextureMap("gridgreen.png");
-			p2.addTextureMap("gridblue.png");
-
-			Sphere s = new Sphere(new Vector(1,1,1), Material.TEXTURE, 0.5);
-
-			s.addTextureMap("checkerboard.png");
-
-			Vector camPos = new Vector(3,3,3);
-			Vector lightPos = new Vector(3,5,2);
-
-			scene.addObject(p0);
-			scene.addObject(p1);
-			scene.addObject(p2);
-			scene.addObject(s);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, s.p0, new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 10:{
-
-			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
-			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
-			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
-
-			p0.addTextureMap("gridred.png");
-			p1.addTextureMap("gridgreen.png");
-			p2.addTextureMap("gridblue.png");
-
-			Sphere s = new Sphere(new Vector(1,1,1), Material.GLASS, 0.5);
-
-			Vector camPos = new Vector(3,3,3);
-			Vector lightPos = new Vector(3,3,3);
-
-			scene.addObject(p0);
-			scene.addObject(p1);
-			scene.addObject(p2);
-			scene.addObject(s);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(1,1,1), new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 11:{
-
-			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
-			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
-			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
-
-			p0.addTextureMap("gridred.png");
-			p1.addTextureMap("coloredgrid.png");
-			p2.addTextureMap("gridblue.png");
-
-			Sphere s0 = new Sphere(new Vector(1,1,1), Material.DIAMOND, 0.5);
-			Sphere s1 = new Sphere(new Vector(3,1,1), Material.SAPPHIRE, 0.5);
-			Sphere s2 = new Sphere(new Vector(5,1,1), Material.EMERALD, 0.5);
-			Sphere s3 = new Sphere(new Vector(7,1,1), Material.RUBY, 0.5);
-
-			Vector camPos = new Vector(4,1,5);
-			Vector lightPos = new Vector(4,4,3);
-
-			scene.addObject(p0);
-			scene.addObject(p1);
-			scene.addObject(p2);
-			scene.addObject(s0);
-			scene.addObject(s1);
-			scene.addObject(s2);
-			scene.addObject(s3);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 12:{
-
-			Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
-			Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
-			Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
-
-			p0.addTextureMap("gridred.png");
-			p1.addTextureMap("coloredgrid.png");
-			p2.addTextureMap("gridblue.png");
-
-			Sphere s0 = new Sphere(new Vector(5,1,1), Material.BRASS, 0.5);
-
-			Vector camPos = new Vector(4,1,5);
-			Vector lightPos = new Vector(4,4,3);
-
-			scene.addObject(p0);
-			scene.addObject(p1);
-			scene.addObject(p2);
-			scene.addObject(s0);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 13:{
-
-			InfCylinder c = new InfCylinder(new Vector(0,0,0), Material.BLUE, new Vector(1,0,0), 1);
-
-			Vector camPos = new Vector(2,2,5);
-			Vector lightPos = new Vector(0,0,5);
-
-			scene.addObject(c);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
-
-			break;
-		}
-
-		case 14:{
-
-			Cylinder c = new Cylinder(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 1);
-
-			Vector camPos = new Vector(-3,0,4);
-			Vector lightPos = new Vector(-3,0,4);
-
-			scene.addObject(c);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
-
-			break;
-
-		}
-		
-		case 15:{
-			
-			Capsule c = new Capsule(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 1);
-
-			Vector camPos = new Vector(2,2,5);
-			Vector lightPos = new Vector(0,0,5);
-
-			scene.addObject(c);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
-
-			break;
-			
-		}
-		
-		case 16:{
-			
-			Cone c = new Cone(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 0.5, 1);
-
-			Vector camPos = new Vector(-3,0,5);
-			Vector lightPos = new Vector(0,0,5);
-
-			scene.addObject(c);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
-
-			break;
-			
-		}
-
-		case 17:{
-			
-			RoundedBox r = new RoundedBox(new Vector(0,0,0), Material.BLUE, new Vector(2,4,1), 0.5);
-			
-			Vector camPos = new Vector(0,0,15);
-			
-			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(45)).timesV(camPos.addDim(1)).dropDim();
-			
-			Vector lightPos = new Vector(0,0,15);
-			
-			scene.addObject(r);
-			scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
-			scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
-
-			r.rotateY(Util.degreeToRadian(0));
-			
-			break;
-			
-		}
-		
-		}
-
-		long startTime = System.currentTimeMillis();
-
-		BufferedImage img = null;
-
-		try {
-			img = new BufferedImage(settings.getWindowX(), settings.getWindowY(), BufferedImage.TYPE_INT_ARGB);
-		}
-
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		int processors = 1;
-
-		if (settings.isMultithreading()) {
-
-			processors = Runtime.getRuntime().availableProcessors();
-
-			int colsPerThread = settings.getWindowX()/processors;
-
-			for (int i = 0; i < processors; i++) {
-
-				int startCol = i * colsPerThread;
-				int endCol = (i+1) * colsPerThread;
-
-				RayTraceRunnable runnable = new RayTraceRunnable(i, img, startCol, endCol, settings.clone(), scene.clone());
-				Thread t = new Thread(runnable);
-				t.start();
-				arrThreads.add(t);
-
-			}
-
-			for (int i = 0; i < arrThreads.size(); i++) 
+			case 0:
 			{
-				arrThreads.get(i).join(); 
+				AABB aabb = new AABB(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
+
+				Vector camPos = new Vector(0.5,0.5,3);
+
+				scene.addObject(aabb);
+				scene.addLight(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
+
+				break;
 			}
 
+			case 1:
+			{
+				Sphere s = new Sphere(new Vector(0,0,0), Material.RED, 1);
+
+				Vector camPos = new Vector(0,0,3);
+				Vector ligPos = new Vector(2,0,3);
+
+				scene.addObject(s);
+				scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
+
+				break;
+			}
+			case 2:
+			{
+				Vector p0 = new Vector(0,0,0);
+				Vector p1 = new Vector(1,0,0);
+				Vector p2 = p0.plus(new Vector(1,0,1).normalize());
+				Vector p3 = new Vector(p2.x(),Math.sqrt(6)/3f,(p0.z()+p1.z()+p2.z())/3);	
+
+				Vector centre = (p0.plus(p1).plus(p2).plus(p3)).divide(4);
+
+				Triangle t0 = new Triangle(p0,p1,p2, Material.RED);
+				Triangle t1 = new Triangle(p1,p0,p3, Material.GREEN);
+				Triangle t2 = new Triangle(p2,p1,p3, Material.BLUE);
+				Triangle t3 = new Triangle(p0,p2,p3, Material.YELLOW);
+
+				Vector camPos = new Vector(0,0,3);
+				Vector ligPos = camPos;
+
+				scene.addObject(t0);
+				scene.addObject(t1);
+				scene.addObject(t2);
+				scene.addObject(t3);
+
+				scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, centre, new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 3:{
+
+				Vector p0 = new Vector(0,0,0);
+				Vector p1 = new Vector(0,1,0);
+				Vector p2 = new Vector(1,0,0);
+
+				Triangle t = new Triangle(p0,p1,p2, Material.RED);
+
+				Vector camPos = new Vector(0,0,1);
+				Vector ligPos = camPos;
+
+				scene.addObject(t);
+				scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, t.centre(), new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 4:{
+
+				Vector p0 = new Vector(0,0,0);
+				Vector n = new Vector(1,1,1);
+
+				Disk d = new Disk(p0, Material.RED, n, 1);
+
+				Vector camPos = new Vector(0,0,5);
+				Vector ligPos = camPos;
+
+				scene.addObject(d);
+				scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, p0, new Vector(0,1,0)));
+				break;
+			}
+
+			case 5:{
+
+				Plane p0 = new Plane(new Vector(0,0,-1.1), Material.RED, new Vector(0,0,1));
+				Plane p1 = new Plane(new Vector(0,-1.1,0), Material.GREEN, new Vector(0,1,0));
+				Plane p2 = new Plane(new Vector(-1.1,0,0), Material.BLUE, new Vector(1,0,0));
+
+				Sphere s = new Sphere(new Vector(0,0,0), Material.MIRROR, 1);
+
+				Vector camPos = new Vector(1,1,4);
+				Vector ligPos = new Vector(0,5,0);
+
+				scene.addObject(p0);
+				scene.addObject(p1);
+				scene.addObject(p2);
+				scene.addObject(s);
+				scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
+				break;
+			}
+
+			case 6:{
+
+				Sphere s = new Sphere(new Vector(0,0,0), Material.BLACK, 2);
+
+				s.addTextureMap("2k_moon.jpg");
+
+				Vector camPos = new Vector(4,4,4);
+				Vector ligPos = new Vector(0,0,4);
+
+				scene.addObject(s);
+				scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+				scene.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
+				break;
+			}
+
+			case 7:{
+
+				AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
+				AABB aabb2 = new AABB(new Vector(5,1,1), Material.BLUE, new Vector(1,1,1));
+				AABB aabb3 = new AABB(new Vector(1,5,1), Material.YELLOW, new Vector(1,1,1));
+				AABB aabb4 = new AABB(new Vector(1,1,5), Material.GREEN, new Vector(1,1,1));
+
+				Vector camPos = new Vector(8,8,8);
+				Vector lightPos = camPos;
+
+				scene.addObject(aabb);
+				scene.addObject(aabb2);
+				scene.addObject(aabb3);
+				scene.addObject(aabb4);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 8:{
+
+				AABB aabb = new AABB(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
+				AABB aabb2 = new AABB(new Vector(2,0,0), Material.BLUE, new Vector(0.5,0.5,0.5));
+				AABB aabb3 = new AABB(new Vector(0,2,0), Material.YELLOW, new Vector(0.5,0.5,0.5));
+				AABB aabb4 = new AABB(new Vector(0,0,2), Material.GREEN, new Vector(0.5,0.5,0.5));
+
+
+				Vector camPos = new Vector(8,8,8);
+				Vector lightPos = new Vector(0,8,0);
+
+				scene.addObject(aabb);
+				scene.addObject(aabb2);
+				scene.addObject(aabb3);
+				scene.addObject(aabb4);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
+
+				aabb2.rotateY(Util.degreeToRadian(45));
+				aabb3.rotateX(Util.degreeToRadian(45));
+				aabb4.rotateZ(Util.degreeToRadian(45));
+
+				break;
+			}
+
+			case 9:{
+
+				Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+				Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+				Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
+
+				p0.addTextureMap("gridred.png");
+				p1.addTextureMap("gridgreen.png");
+				p2.addTextureMap("gridblue.png");
+
+				Sphere s = new Sphere(new Vector(1,1,1), Material.TEXTURE, 0.5);
+
+				s.addTextureMap("checkerboard.png");
+
+				Vector camPos = new Vector(3,3,3);
+				Vector lightPos = new Vector(3,5,2);
+
+				scene.addObject(p0);
+				scene.addObject(p1);
+				scene.addObject(p2);
+				scene.addObject(s);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, s.p0, new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 10:{
+
+				Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+				Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+				Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
+
+				p0.addTextureMap("gridred.png");
+				p1.addTextureMap("gridgreen.png");
+				p2.addTextureMap("gridblue.png");
+
+				Sphere s = new Sphere(new Vector(1,1,1), Material.GLASS, 0.5);
+
+				Vector camPos = new Vector(3,3,3);
+				Vector lightPos = new Vector(3,3,3);
+
+				scene.addObject(p0);
+				scene.addObject(p1);
+				scene.addObject(p2);
+				scene.addObject(s);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(1,1,1), new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 11:{
+
+				Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+				Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+				Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
+
+				p0.addTextureMap("gridred.png");
+				p1.addTextureMap("coloredgrid.png");
+				p2.addTextureMap("gridblue.png");
+
+				Sphere s0 = new Sphere(new Vector(1,1,1), Material.DIAMOND, 0.5);
+				Sphere s1 = new Sphere(new Vector(3,1,1), Material.SAPPHIRE, 0.5);
+				Sphere s2 = new Sphere(new Vector(5,1,1), Material.EMERALD, 0.5);
+				Sphere s3 = new Sphere(new Vector(7,1,1), Material.RUBY, 0.5);
+
+				Vector camPos = new Vector(4,1,5);
+				Vector lightPos = new Vector(4,4,3);
+
+				scene.addObject(p0);
+				scene.addObject(p1);
+				scene.addObject(p2);
+				scene.addObject(s0);
+				scene.addObject(s1);
+				scene.addObject(s2);
+				scene.addObject(s3);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 12:{
+
+				Plane p0 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+				Plane p1 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,0,1));
+				Plane p2 = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(1,0,0));
+
+				p0.addTextureMap("gridred.png");
+				p1.addTextureMap("coloredgrid.png");
+				p2.addTextureMap("gridblue.png");
+
+				Sphere s0 = new Sphere(new Vector(5,1,1), Material.BRASS, 0.5);
+
+				Vector camPos = new Vector(4,1,5);
+				Vector lightPos = new Vector(4,4,3);
+
+				scene.addObject(p0);
+				scene.addObject(p1);
+				scene.addObject(p2);
+				scene.addObject(s0);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 13:{
+
+				InfCylinder c = new InfCylinder(new Vector(0,0,0), Material.BLUE, new Vector(1,0,0), 1);
+
+				Vector camPos = new Vector(2,2,5);
+				Vector lightPos = new Vector(0,0,5);
+
+				scene.addObject(c);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+				break;
+			}
+
+			case 14:{
+
+				Cylinder c = new Cylinder(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 1);
+
+				Vector camPos = new Vector(-3,0,4);
+				Vector lightPos = new Vector(-3,0,4);
+
+				scene.addObject(c);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+				break;
+
+			}
+
+			case 15:{
+
+				Capsule c = new Capsule(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 1);
+
+				Vector camPos = new Vector(2,2,5);
+				Vector lightPos = new Vector(0,0,5);
+
+				scene.addObject(c);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+				break;
+
+			}
+
+			case 16:{
+
+				Cone c = new Cone(new Vector(-2,0,0), Material.BLUE, new Vector(2,0,0), 0.5, 1);
+
+				Vector camPos = new Vector(-3,0,5);
+				Vector lightPos = new Vector(0,0,5);
+
+				scene.addObject(c);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+				break;
+
+			}
+
+			case 17:{
+
+				RoundedBox r = new RoundedBox(new Vector(0,0,0), Material.BLUE, new Vector(2,4,1), 0.5);
+
+				Vector camPos = new Vector(0,0,15);
+
+				camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+
+				Vector lightPos = new Vector(0,0,15);
+
+				scene.addObject(r);
+				scene.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+				r.rotateY(Util.degreeToRadian(0));
+
+				break;
+
+			}
+			
+			case 18:{
+				
+				double sin = (Math.sin(time*2*Math.PI)/2)+0.5;
+				
+				Vector v = new Vector(sin,0,1-sin);
+				
+				Material m = new Material("m");
+				m.setAmbient(v.timesConst(0.2));
+				m.setDiffuse(v);
+				m.setSpecular(new Vector(1,1,1),20);
+				Sphere s = new Sphere(new Vector(sin,0,1-sin), m, 1);
+
+				Vector camPos = new Vector(0,0,3);
+				Vector ligPos = new Vector(2,0,3);
+
+				scene.addObject(s);
+				scene.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+				scene.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+				break;
+				
+			}
+
+			}
+
+			long startTime = System.currentTimeMillis();
+
+			BufferedImage img = null;
+
+			try {
+				img = new BufferedImage(settings.getWindowX(), settings.getWindowY(), BufferedImage.TYPE_INT_ARGB);
+			}
+
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+
+			int processors = 1;
+
+			if (settings.isMultithreading()) {
+
+				processors = Runtime.getRuntime().availableProcessors();
+
+				int colsPerThread = settings.getWindowX()/processors;
+
+				for (int i = 0; i < processors; i++) {
+
+					int startCol = i * colsPerThread;
+					int endCol = (i+1) * colsPerThread;
+
+					RayTraceRunnable runnable = new RayTraceRunnable(i, img, startCol, endCol, settings.clone(), scene.clone());
+					Thread t = new Thread(runnable);
+					t.start();
+					arrThreads.add(t);
+
+				}
+
+				for (int i = 0; i < arrThreads.size(); i++) 
+				{
+					arrThreads.get(i).join(); 
+				}
+
+			}
+
+			else {
+
+				rayTrace(0, img, 0, settings.getWindowX(), settings, scene);
+
+			}
+
+			File directory = new File(directoryName);
+			if (!directory.exists()) directory.mkdir();
+
+			File outputfile = new File(directoryName + "\\" + outputFileName + step + ".png");
+			ImageIO.write(img, "png", outputfile);
+
+			//		Desktop dt = Desktop.getDesktop();
+			//		dt.open(outputfile);
+
+			long endTime = System.currentTimeMillis();
+			long elapsedTime = endTime - startTime;
+
+			System.out.println();
+			System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
+
+			int totalPixels = settings.getWindowX() * settings.getWindowY();
+			int totalSubpixels = totalPixels * settings.getTotalSubPixels();
+
+			System.out.println("Total pixels: " + totalPixels);
+			System.out.println("Pixels per second (per thread): " + totalPixels / elapsedTime + " (" + ((totalPixels / elapsedTime)/processors) + ")");
+			System.out.println("Subpixels per second (per thread): " + totalSubpixels / elapsedTime + " (" + ((totalSubpixels / elapsedTime)/processors) + ")");
+
 		}
 
-		else {
+		BufferedImage firstImage = ImageIO.read(new File (directoryName + "\\" + outputFileName + "0.png"));
+		ImageOutputStream output = new FileImageOutputStream(new File(outputFileName + ".gif"));
 
-			rayTrace(0, img, 0, settings.getWindowX(), settings, scene);
+		int deltaTperStepMillis = Math.round((long)deltaTperStep*1000);
 
+		GifSequenceWriter writer = new GifSequenceWriter(output, firstImage.getType(), deltaTperStepMillis, false);
+
+		writer.writeToSequence(firstImage);
+		for(int i=1; i<=totalSteps; i++) {
+			BufferedImage nextImage = ImageIO.read(new File(directoryName + "\\" + outputFileName + i + ".png"));
+			writer.writeToSequence(nextImage);
 		}
 
-		File outputfile = new File(outputFileName);
-		ImageIO.write(img, "png", outputfile);
+		writer.close();
+		output.close();
 
 		Desktop dt = Desktop.getDesktop();
-		dt.open(outputfile);
-
-		long endTime = System.currentTimeMillis();
-		long elapsedTime = endTime - startTime;
-
-		System.out.println();
-		System.out.println("Elapsed time: " + elapsedTime/1000f + " seconds");
-
-		int totalPixels = settings.getWindowX() * settings.getWindowY();
-		int totalSubpixels = totalPixels * settings.getTotalSubPixels();
-
-		System.out.println("Total pixels: " + totalPixels);
-		System.out.println("Pixels per second (per thread): " + totalPixels / elapsedTime + " (" + ((totalPixels / elapsedTime)/processors) + ")");
-		System.out.println("Subpixels per second (per thread): " + totalSubpixels / elapsedTime + " (" + ((totalSubpixels / elapsedTime)/processors) + ")");
-
+		dt.open(new File(outputFileName + ".gif"));
 	}
 
 	public static void rayTrace(int threadNum, BufferedImage img, int startCol, int endCol, Settings settings, Scene scene) {
@@ -550,10 +610,10 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 
-//						if (column == 1366/2 && row == 768/2) {
-//							System.out.print("");
-//						}
-						
+						//						if (column == 1366/2 && row == 768/2) {
+						//							System.out.print("");
+						//						}
+
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
