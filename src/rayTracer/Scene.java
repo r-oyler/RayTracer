@@ -459,6 +459,25 @@ public class Scene {
 			break;
 
 		}
+		
+		case 19:{
+			
+			Ellipsoid e = new Ellipsoid(new Vector(0,0,0), Material.BLUE, new Vector(1,0.5,0.6));
+
+			Vector camPos = new Vector(0,0,5);
+			
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+			
+			Vector lightPos = new Vector(0,0,5);
+
+			this.addObject(e);
+			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+			break;
+			
+		}
 
 		}
 

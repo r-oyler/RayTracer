@@ -18,11 +18,11 @@ public class Capsule extends MatObject {
 		Vector span = this.p1.minus(p0);
 		Vector cToR = ray.origin.minus(this.p0);
 
-		double span_span = span.squared();
+		double span_span = span.dotSelf();
 		double span_rD = span.dotProduct(ray.direction);
 		double span_cToR = span.dotProduct(cToR);
 		double rD_cToR = ray.direction.dotProduct(cToR);
-		double cToR_cToR = cToR.squared();
+		double cToR_cToR = cToR.dotSelf();
 
 		double a = span_span - span_rD*span_rD;
 		double b = span_span*rD_cToR - span_cToR*span_rD;
@@ -45,7 +45,7 @@ public class Capsule extends MatObject {
 
 					Vector cToHit = hitPoint.minus(this.p0);
 
-					double h1 = Util.clamp((cToHit.dotProduct(span)/span.squared()), 0, 1);
+					double h1 = Util.clamp((cToHit.dotProduct(span)/span.dotSelf()), 0, 1);
 
 					Vector normal = cToHit.minus(span.timesConst(h1)).divide(this.radius);
 
@@ -62,7 +62,7 @@ public class Capsule extends MatObject {
 			Vector oc = (y <= 0) ? cToR : ray.origin.minus(this.p1);
 
 			b = ray.direction.dotProduct(oc);
-			c = oc.squared() - this.radius*this.radius;
+			c = oc.dotSelf() - this.radius*this.radius;
 
 			h = b*b - c;
 
@@ -76,7 +76,7 @@ public class Capsule extends MatObject {
 
 					Vector cToHit = hitPoint.minus(this.p0);
 
-					double h1 = Util.clamp((cToHit.dotProduct(span)/span.squared()), 0, 1);
+					double h1 = Util.clamp((cToHit.dotProduct(span)/span.dotSelf()), 0, 1);
 
 					Vector normal = cToHit.minus(span.timesConst(h1)).divide(this.radius);
 

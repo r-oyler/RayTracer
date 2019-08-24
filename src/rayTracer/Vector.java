@@ -111,7 +111,7 @@ public class Vector {
 		return prod;
 	}
 	
-	double squared() {
+	double dotSelf() {
 		return this.dotProduct(this);
 	}
 

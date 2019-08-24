@@ -26,12 +26,12 @@ public class Cone extends MatObject {
 		double m1 = endAToR.dotProduct(span);
 		double m2 = ray.direction.dotProduct(span);
 		double m3 = ray.direction.dotProduct(endAToR);
-		double m5 = endAToR.squared();
+		double m5 = endAToR.dotSelf();
 		double m9 = endBToR.dotProduct(span);
 
 		// caps
 		if (m1 < 0) {
-			if ((endAToR.timesConst(m2).minus(ray.direction.timesConst(m1))).squared() < (this.radiusA*this.radiusA*m2*m2)) {
+			if ((endAToR.timesConst(m2).minus(ray.direction.timesConst(m1))).dotSelf() < (this.radiusA*this.radiusA*m2*m2)) {
 
 				double time = -m1/m2;
 
@@ -56,7 +56,7 @@ public class Cone extends MatObject {
 
 			if (time > 0) {
 
-				if (endBToR.plus(ray.direction.timesConst(time)).squared() < (radiusB*radiusB)) {
+				if (endBToR.plus(ray.direction.timesConst(time)).dotSelf() < (radiusB*radiusB)) {
 
 					Vector hitPoint = ray.atTime(time);
 

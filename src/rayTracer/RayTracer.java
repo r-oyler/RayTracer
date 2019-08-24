@@ -49,14 +49,14 @@ public class RayTracer {
 		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 18, 0, 18);
+		int sceneNum = Input.getInt("Scene number", 19, 0, 19);
 
-		int totalSteps = 10;
-		double deltaTperStep = 1.0/10.0; 
+		int totalFrames = 10;
+		double deltaTperFrame = 1.0/10.0; 
 
-		for(int step = 0; step <= totalSteps; step++ ){
+		for(int frame = 0; frame < totalFrames; frame++ ){
 
-			double time = step*deltaTperStep;
+			double time = frame*deltaTperFrame;
 
 			scene = new Scene();
 			
@@ -110,7 +110,7 @@ public class RayTracer {
 			File directory = new File(directoryName);
 			if (!directory.exists()) directory.mkdir();
 
-			File outputfile = new File(directoryName + "\\" + outputFileName + step + ".png");
+			File outputfile = new File(directoryName + "\\" + outputFileName + frame + ".png");
 			ImageIO.write(img, "png", outputfile);
 
 			//		Desktop dt = Desktop.getDesktop();
@@ -134,12 +134,12 @@ public class RayTracer {
 		BufferedImage firstImage = ImageIO.read(new File (directoryName + "\\" + outputFileName + "0.png"));
 		ImageOutputStream output = new FileImageOutputStream(new File(outputFileName + ".gif"));
 
-		int deltaTperStepMillis = Math.round((long)deltaTperStep*1000);
+		int deltaTperStepMillis = Math.round((long)deltaTperFrame*1000);
 
 		GifSequenceWriter writer = new GifSequenceWriter(output, firstImage.getType(), deltaTperStepMillis, false);
 
 		writer.writeToSequence(firstImage);
-		for(int i=1; i<=totalSteps; i++) {
+		for(int i=1; i<totalFrames; i++) {
 			BufferedImage nextImage = ImageIO.read(new File(directoryName + "\\" + outputFileName + i + ".png"));
 			writer.writeToSequence(nextImage);
 		}
