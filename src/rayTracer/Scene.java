@@ -496,6 +496,24 @@ public class Scene {
 			break;
 			
 		}
+		
+		case 21:{
+			
+			Sphere4 s = new Sphere4(new Vector(0,0,0), Material.BLUE, 1);
+			
+			Vector camPos = new Vector(0,0,5);
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+			
+			Vector lightPos = camPos;
+
+			this.addObject(s);
+			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+			break;
+			
+		}
 
 		}
 

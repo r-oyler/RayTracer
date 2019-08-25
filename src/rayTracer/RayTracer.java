@@ -49,7 +49,7 @@ public class RayTracer {
 		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 20, 0, 20);
+		int sceneNum = Input.getInt("Scene number", 21, 0, 21);
 		
 		double totalTime = 1.0;
 		int totalFrames = 30;
