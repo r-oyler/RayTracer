@@ -49,10 +49,11 @@ public class RayTracer {
 		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 19, 0, 19);
-
-		int totalFrames = 10;
-		double deltaTperFrame = 1.0/10.0; 
+		int sceneNum = Input.getInt("Scene number", 20, 0, 20);
+		
+		double totalTime = 1.0;
+		int totalFrames = 30;
+		double deltaTperFrame = totalTime/totalFrames; 
 
 		for(int frame = 0; frame < totalFrames; frame++ ){
 
@@ -207,9 +208,9 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 
-						//						if (column == 1366/2 && row == 768/2) {
-						//							System.out.print("");
-						//						}
+						if (column == 1366/2 && row == 768/2) {
+							System.out.print("");
+						}
 
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();

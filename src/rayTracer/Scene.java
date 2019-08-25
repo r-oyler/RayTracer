@@ -478,6 +478,24 @@ public class Scene {
 			break;
 			
 		}
+		
+		case 20:{
+			
+			Torus t = new Torus(new Vector(0,0,0), Material.BLUE, 4,2);
+			
+			Vector camPos = new Vector(0,0,15);
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+			
+			Vector lightPos = new Vector(0,0,15);
+
+			this.addObject(t);
+			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
+
+			break;
+			
+		}
 
 		}
 

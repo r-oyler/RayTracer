@@ -84,6 +84,7 @@ public class Util {
 
 	}
 
+	// replace usage with Math.signum
 	public static double sign(double d) {
 
 		if (d < 0) {

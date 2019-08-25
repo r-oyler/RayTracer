@@ -9,13 +9,13 @@ public class Ellipsoid extends MatObject {
 		this.radii = radii;
 	}
 
-	@Override
+	// http://iquilezles.org/www/articles/intersectors/intersectors.htm
 	boolean Intersect(Ray ray, IntersectInfo info) {
 		
 		Matrix4 objToWorld = this.transform;
 		Matrix4 worldToObj = Invert.invert(objToWorld);
 		
-		// convert from world to box space
+		// convert from world to object space
 		Vector rayDirectionOS = worldToObj.timesV(ray.direction.addDim(0)).dropDim();
 		Vector rayOriginOS = worldToObj.timesV(ray.origin.addDim(1)).dropDim();
 		
