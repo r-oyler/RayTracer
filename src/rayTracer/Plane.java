@@ -48,36 +48,10 @@ public class Plane extends MatObject {
 		if (time < info.getTime()) { // if this intersection is the closest so far (or first)        	
 			Vector hitPoint = ray.atTime(time);
 			
-			info.setTime(time);
-			info.setHitPoint(hitPoint);
-			info.setNormal(this.normal);
-			info.setMaterial(this.material);
-			
-			if (this.hasTextureMap) {
-				Vector color = this.getUVcolor(this.calcUV(hitPoint));
-				info.setUVcolor(color);
-			}
-			else {
-            	info.setHasNoUV();
-            }
-			
-			info.setObject(this);
-			info.setObjectName(this.name);
+			info.updateInfo(time, hitPoint, this.normal, this);
 		}
 
 		return true;
-	}
-	
-	double distanceToPoint(Vector p) {
-		
-		if (p.dim !=3) throw new IllegalArgumentException("Point must be vector of dimension 3");
-		
-		Vector planeOriginToPoint = p.minus(this.Position());
-		
-		Vector planeToPoint = this.normal.timesConst(planeOriginToPoint.dotProduct(this.normal));
-		
-		return planeToPoint.length();
-		
 	}
 
 	@Override

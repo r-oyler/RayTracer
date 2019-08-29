@@ -8,9 +8,9 @@ public class RoundedBox extends MatObject{
 
 	RoundedBox(Vector p, Material m, Vector boxSize, double radius) {
 		super(p, m);
-		
+
 		if (radius >= boxSize.min()) throw new IllegalArgumentException("Radius cannot be larger than the smallest box size dimension");
-		
+
 		this.boxSize = boxSize;
 		this.radius = radius;
 	}
@@ -57,19 +57,23 @@ public class RoundedBox extends MatObject{
 		if (Math.min(Math.min(pos.x(), pos.y()), pos.z()) < 0) {
 
 			if (time > 0) {
-			
-				Vector hitPointBS = rayOriginBS.plus(rayDirectionBS.timesConst(time));
-				Vector normalBS = this.calcNormal(hitPointBS);
-				
-				Vector hitPoint = ray.atTime(time);
-				Vector normal = boxToWorld.timesV(normalBS.addDim(0)).dropDim();
-				
-				info.updateInfo(time, hitPoint, normal, this);
-				
+
+				if (time < info.getTime()) {
+
+					Vector hitPointBS = rayOriginBS.plus(rayDirectionBS.timesConst(time));
+					Vector normalBS = this.calcNormal(hitPointBS);
+
+					Vector hitPoint = ray.atTime(time);
+					Vector normal = boxToWorld.timesV(normalBS.addDim(0)).dropDim();
+
+					info.updateInfo(time, hitPoint, normal, this);
+
+				}
+
 				return true;
-				
+
 			}
-			
+
 		}
 
 		// some precomputation
@@ -137,37 +141,41 @@ public class RoundedBox extends MatObject{
 				}	
 			}
 		}
-		
+
 		if (time > 1e19) {
 			return false;
 		}
 
 		if (time > 0) {
-		
-			Vector hitPointBS = rayOriginBS.plus(rayDirectionBS.timesConst(time));
-			Vector normalBS = this.calcNormal(hitPointBS);
-			
-			Vector hitPoint = ray.atTime(time);
-			Vector normal = boxToWorld.timesV(normalBS.addDim(0)).dropDim();
-			
-			info.updateInfo(time, hitPoint, normal, this);
-			
+
+			if (time < info.getTime()) {
+
+				Vector hitPointBS = rayOriginBS.plus(rayDirectionBS.timesConst(time));
+				Vector normalBS = this.calcNormal(hitPointBS);
+
+				Vector hitPoint = ray.atTime(time);
+				Vector normal = boxToWorld.timesV(normalBS.addDim(0)).dropDim();
+
+				info.updateInfo(time, hitPoint, normal, this);
+
+			}
+
 			return true;
-		
+
 		}
-		
+
 		return false;
 	}
 
 	Vector calcNormal(Vector hitPoint) {
-		
+
 		Vector t = hitPoint.absolute().minus(this.boxSize).max(0).normalize();
 		Vector normal = hitPoint.sign().multComponents(t);
-		
+
 		return normal;
-		
+
 	}
-	
+
 	@Override
 	Vector calcUV(Vector hitPoint) {
 		// TODO Auto-generated method stub
@@ -176,10 +184,10 @@ public class RoundedBox extends MatObject{
 
 	@Override
 	public RoundedBox clone() {
-		
+
 		RoundedBox clone = new RoundedBox(this.p0.clone(), this.material.clone(), this.boxSize.clone(), radius);
 		clone.transform = this.transform.clone();
-		
+
 		return clone;
 	}
 

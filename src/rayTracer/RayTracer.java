@@ -49,7 +49,7 @@ public class RayTracer {
 		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 23, 0, 23);
+		int sceneNum = Input.getInt("Scene number", 22, 0, 23);
 		
 		double totalTime = 1.0;
 		int totalFrames = 1;
@@ -113,9 +113,6 @@ public class RayTracer {
 
 			File outputfile = new File(directoryName + "\\" + outputFileName + frame + ".png");
 			ImageIO.write(img, "png", outputfile);
-
-			//		Desktop dt = Desktop.getDesktop();
-			//		dt.open(outputfile);
 
 			long endTime = System.currentTimeMillis();
 			long elapsedTime = endTime - startTime;
@@ -207,10 +204,6 @@ public class RayTracer {
 						payload.setNumBounces(0);
 
 						Vector color = scene.getBackgroundColor();
-
-						if (column == 657 && row == 410) {
-							System.out.print("");
-						}
 
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
@@ -312,10 +305,6 @@ public class RayTracer {
 
 							Vector normal = info.getNormal();
 							double cosTheta = objectToLight.cosAngleBetween(normal);
-
-							if (cosTheta == 0) {
-								System.out.println("Help");
-							}
 
 							cosTheta = Math.max(0, cosTheta);
 

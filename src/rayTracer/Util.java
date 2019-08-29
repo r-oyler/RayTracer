@@ -84,21 +84,6 @@ public class Util {
 
 	}
 
-	// replace usage with Math.signum
-	public static double sign(double d) {
-
-		if (d < 0) {
-			return -1;
-		}
-		else if (d > 0) {
-			return 1;
-		}
-		else {
-			return 0;
-		}
-
-	}
-
 	public static double step(double edge, double d) {
 
 		if (d < edge) {
@@ -198,20 +183,6 @@ public class Util {
 			return incident.timesConst(eta).plus(normal.timesConst(eta * cosIncident - Math.sqrt(k)));
 			
 		}
-		
-	}
-	
-	// Unsure if correct
-	public static double Schlick(Vector incident, Vector normal, double ior) {
-		
-		double rNaught = (1-ior)/(1+ior);
-		rNaught *= rNaught;
-		
-		double cosTheta = incident.dotProduct(normal);
-		
-		double rTheta = rNaught + (1 - rNaught)*Math.pow((1 - cosTheta),5);
-		
-		return rTheta;
 		
 	}
 	

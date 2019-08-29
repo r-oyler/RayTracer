@@ -129,22 +129,7 @@ public class Triangle extends MatObject {
 				return false;
 			}
 
-			// Point is within triangle
-			info.setTime(time);
-			info.setHitPoint(ray.atTime(time));
-			info.setNormal(this.normal);
-			info.setMaterial(this.material);
-			
-			if (this.hasTextureMap) {
-            	Vector color = this.getUVcolor(this.calcUV(hitPoint));
-    			info.setUVcolor(color);
-            }
-            else {
-            	info.setHasNoUV();
-            }
-			
-			info.setObject(this);
-			info.setObjectName(this.name);
+			info.updateInfo(time, hitPoint, this.normal, this);
 			
 		}
 		

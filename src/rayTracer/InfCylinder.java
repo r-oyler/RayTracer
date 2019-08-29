@@ -56,21 +56,7 @@ public class InfCylinder extends MatObject {
         	// TODO: Fix
         	Vector normal = this.p0.minus(this.direction.timesConst(hitToC_cDir/cDir_cDir)).plus(hitPoint);        	
         	
-        	info.setTime(time);
-            info.setHitPoint(hitPoint);
-            info.setNormal(normal);
-            info.setMaterial(this.material);
-            
-            if (this.hasTextureMap) {
-            	Vector color = this.getUVcolor(this.calcUV(hitPoint));
-    			info.setUVcolor(color);
-            }
-            else {
-            	info.setHasNoUV();
-            }
-            
-            info.setObject(this);
-            info.setObjectName(this.name);
+        	info.updateInfo(time, hitPoint, normal, this);
         }
         
         return true;

@@ -14,7 +14,7 @@ public class Torus extends MatObject {
 	// http://iquilezles.org/www/articles/intersectors/intersectors.htm
 	// https://www.shadertoy.com/view/4sBGDy
 	boolean Intersect(Ray ray, IntersectInfo info) {
-		
+
 		Matrix4 objToWorld = this.transform;
 		Matrix4 worldToObj = Invert.invert(objToWorld);
 
@@ -23,13 +23,13 @@ public class Torus extends MatObject {
 		Vector rayOriginOS = worldToObj.timesV(ray.origin.addDim(1)).dropDim();
 
 		double po = 1.0;
-		
+
 		double Ra2 = this.radiusMajor * this.radiusMajor;
 		double ra2 = this.radiusMinor * this.radiusMinor;
-		
+
 		double m = rayOriginOS.dotSelf();
 		double n = rayOriginOS.dotProduct(rayDirectionOS);
-		
+
 		double k = (m - ra2 - Ra2)/2.0;
 		double k3 = n;
 		double k2 = n*n + Ra2*rayDirectionOS.z()*rayDirectionOS.z() + k;
@@ -49,8 +49,8 @@ public class Torus extends MatObject {
 		}
 
 		double c2 = 2.0*k2 - 3.0*k3*k3;
-	    double c1 = k3*(k3*k3 - k2) + k1;
-	    double c0 = k3*(k3*(-3.0*k3*k3 + 4.0*k2) - 8.0*k1) + 4.0*k0;
+		double c1 = k3*(k3*k3 - k2) + k1;
+		double c0 = k3*(k3*(-3.0*k3*k3 + 4.0*k2) - 8.0*k1) + 4.0*k0;
 
 		c2 /= 3.0;
 		c1 *= 2.0;
@@ -58,10 +58,10 @@ public class Torus extends MatObject {
 
 		double Q = c2*c2 + c0;
 		double R = 3.0*c0*c2 - c2*c2*c2 - c1*c1;
-		
+
 		double h = R*R - Q*Q*Q;
 		double z = 0.0;
-		
+
 		if (h < 0.0) {
 			// 4 intersections
 			double sQ = Math.sqrt(Q);
@@ -70,10 +70,10 @@ public class Torus extends MatObject {
 		else {
 			// 2 intersections
 			double sQ = Math.pow(Math.sqrt(h)+Math.abs(R), 1.0/3.0);
-			z = Util.sign(R)*Math.abs(sQ + Q/sQ);
+			z = Math.signum(R)*Math.abs(sQ + Q/sQ);
 		}
 		z = c2 -z;
-		
+
 		double d1 = z	- 3.0*c2;
 		double d2 = z*z	- 3.0*c0;
 		if (Math.abs(d1) < 1e-4) {
@@ -85,9 +85,9 @@ public class Torus extends MatObject {
 			d1 = Math.sqrt(d1/2.0);
 			d2 = c1/d1;
 		}
-		
+
 		double time = 1e20;
-		
+
 		h = d1*d1 - z + d2;
 		if (h > 0.0) {
 			h = Math.sqrt(h);
@@ -96,7 +96,7 @@ public class Torus extends MatObject {
 			if (t1 > 0.0) time = t1;
 			if (t2 > 0.0) time = Math.min(time, t2);
 		}
-		
+
 		h = d1*d1 - z - d2;
 		if (h > 0.0) {
 			h = Math.sqrt(h);
@@ -105,19 +105,23 @@ public class Torus extends MatObject {
 			if (t1 > 0.0) time = Math.min(time, t1);
 			if (t2 > 0.0) time = Math.min(time, t2);
 		}
-		
+
 		if (time > 1e19) return false;
-		
-		Vector hitPointOS = rayOriginOS.plus(rayDirectionOS.timesConst(time));
-		Vector normalOS = this.calcNormal(hitPointOS);
-		
-		Vector hitPoint = ray.atTime(time);
-		Vector normal = objToWorld.timesV(normalOS.addDim(0)).dropDim();
-		
-		info.updateInfo(time, hitPoint, normal, this);
-		
+
+		if (time < info.getTime()) {
+
+			Vector hitPointOS = rayOriginOS.plus(rayDirectionOS.timesConst(time));
+			Vector normalOS = this.calcNormal(hitPointOS);
+
+			Vector hitPoint = ray.atTime(time);
+			Vector normal = objToWorld.timesV(normalOS.addDim(0)).dropDim();
+
+			info.updateInfo(time, hitPoint, normal, this);
+
+		}
+
 		return true;
-		
+
 	}
 
 	private Vector calcNormal(Vector hitPointOS) {
@@ -130,7 +134,7 @@ public class Torus extends MatObject {
 		Vector t2 = v.timesConst(R2);
 
 		return hitPointOS.multComponents(t1.minus(t2)).normalize();
-		
+
 	}
 
 	@Override

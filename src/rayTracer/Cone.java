@@ -13,7 +13,7 @@ public class Cone extends MatObject {
 		this.radiusB = radiusB;
 	}
 
-	// http://iquilezles.org/www/articles/intersectors/intersectors.htm
+	// https://www.shadertoy.com/view/llcfRf
 	boolean Intersect(Ray ray, IntersectInfo info) {
 
 		Vector endA = this.p0;
@@ -37,12 +37,15 @@ public class Cone extends MatObject {
 
 				if (time > 0) {
 
-					Vector hitPoint = ray.atTime(time);
+					if (time < info.getTime()) {
+					
+						Vector hitPoint = ray.atTime(time);
+						Vector normal = span.timesConst(-Util.inverseSqrt(m0));
 
-					Vector normal = span.timesConst(-Util.inverseSqrt(m0));
+						info.updateInfo(time, hitPoint, normal, this);
 
-					info.updateInfo(time, hitPoint, normal, this);
-
+					}
+					
 					return true;
 
 				}
@@ -58,11 +61,14 @@ public class Cone extends MatObject {
 
 				if (endBToR.plus(ray.direction.timesConst(time)).dotSelf() < (radiusB*radiusB)) {
 
-					Vector hitPoint = ray.atTime(time);
+					if (time < info.getTime()) {
 
-					Vector normal = span.timesConst(Util.inverseSqrt(m0));
+						Vector hitPoint = ray.atTime(time);
+						Vector normal = span.timesConst(Util.inverseSqrt(m0));
 
-					info.updateInfo(time, hitPoint, normal, this);
+						info.updateInfo(time, hitPoint, normal, this);
+
+					}
 
 					return true;
 
@@ -93,19 +99,23 @@ public class Cone extends MatObject {
 
 		if (time > 0) {
 
-			Vector hitPoint = ray.atTime(time);
+			if (time < info.getTime()) {
 
-			Vector normal = endAToR.plus(ray.direction.timesConst(time)).timesConst(m0);
-			normal = normal.plus(span.timesConst(rr*radiusA)).timesConst(m0);
-			normal = normal.minus(span.timesConst(hy*y));
+				Vector hitPoint = ray.atTime(time);
 
-			info.updateInfo(time, hitPoint, normal, this);
+				Vector normal = endAToR.plus(ray.direction.timesConst(time)).timesConst(m0);
+				normal = normal.plus(span.timesConst(rr*radiusA)).timesConst(m0);
+				normal = normal.minus(span.timesConst(hy*y));
+
+				info.updateInfo(time, hitPoint, normal, this);
+
+			}
 
 			return true;
 		}
-		
+
 		return false;
-		
+
 	}
 
 	@Override

@@ -256,7 +256,7 @@ public class Vector {
 
 		for (int i = 0; i<dim; i++) {
 
-			sign[i] = Util.sign(this.d[i]);
+			sign[i] = Math.signum(this.d[i]);
 			
 		}
 

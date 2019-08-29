@@ -43,10 +43,15 @@ public class Cylinder extends MatObject {
 		if( y>0.0 && y<baba ) {
 
 			if (t > 0) {
-				Vector hitPoint = ray.atTime(t);
-				Vector normal = (rd.timesConst(t).plus(oc).minus(ba.timesConst(y/baba))).divide(ra);
 
-				info.updateInfo(t, hitPoint, normal, this);
+				if (t < info.getTime()) {
+
+					Vector hitPoint = ray.atTime(t);
+					Vector normal = (rd.timesConst(t).plus(oc).minus(ba.timesConst(y/baba))).divide(ra);
+
+					info.updateInfo(t, hitPoint, normal, this);
+
+				}
 
 				return true;
 			}
@@ -57,11 +62,16 @@ public class Cylinder extends MatObject {
 		if( Math.abs(k1+k2*t)<h )
 		{
 			if (t > 0) {
-				Vector hitPoint = ray.atTime(t);
-				Vector normal =  ba.timesConst(Util.sign(y/baba));
-				
-				info.updateInfo(t, hitPoint, normal, this);
-				
+
+				if (t < info.getTime()) {
+
+					Vector hitPoint = ray.atTime(t);
+					Vector normal =  ba.timesConst(Math.signum(y/baba));
+
+					info.updateInfo(t, hitPoint, normal, this);
+
+				}
+
 				return true;
 			}
 		}

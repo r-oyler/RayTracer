@@ -47,49 +47,15 @@ public class Sphere extends MatObject {
         
         double time = t0;
         
-        if (time == Double.NaN) {
-        	System.out.println("Error");
-        }
-        
         if (time < info.getTime()) { // if this intersection is the closest so far (or first)        	
         	Vector hitPoint = ray.atTime(time);
+        	Vector normal = hitPoint.minus(this.Position()).normalize();
         	
-        	info.setTime(time);
-            info.setHitPoint(hitPoint);
-            info.setNormal(info.getHitPoint().minus(this.Position()).normalize());
-            info.setMaterial(this.material);
-            
-            if (this.hasTextureMap) {
-            	Vector color = this.getUVcolor(this.calcUV(hitPoint));
-    			info.setUVcolor(color);
-            }
-            else {
-            	info.setHasNoUV();
-            }
-            
-            info.setObject(this);
-            info.setObjectName(this.name);
+        	info.updateInfo(time, hitPoint, normal, this);
         }
         
         return true;        
         
-	}
-
-	public double distanceToPoint(Vector p) {
-		
-		Vector centreToPoint = this.Position().minus(p);
-		
-		return centreToPoint.length() - this.radius;
-		
-	}
-	
-	public double distanceToSphere(Sphere s) {
-		
-		double radiusSum = this.radius + s.radius;
-		double centreDistance = this.Position().minus(s.Position()).length();
-		
-		return (centreDistance-radiusSum);
-		
 	}
 
 	public Vector calcUV(Vector hitPoint) {

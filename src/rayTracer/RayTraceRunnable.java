@@ -24,9 +24,7 @@ public class RayTraceRunnable implements Runnable {
 	
 	@Override
 	public void run() {
-		//System.out.println(startCol + " - " + (endCol-1) + " starting.");
 		RayTracer.rayTrace(this.threadNum, this.img, this.startCol, this.endCol, this.stepSize, this.settings, this.scene);
-		//System.out.println(startCol + " - " + (endCol-1) + " exiting.");
 	}
 
 }

@@ -40,37 +40,23 @@ public class AABB extends MatObject {
 			return false; // no intersection
 		}
 
-		Vector t1yzx = new Vector(t1.y(),t1.z(),t1.x());
-		Vector t1xyz = new Vector(t1.x(),t1.y(),t1.z());
-		Vector t1zxy = new Vector(t1.z(),t1.x(),t1.y());
-
-		Vector normal = rayDirectionBS.sign().timesConst(-1);
-		normal = normal.multComponents(t1xyz.step(t1yzx));
-		normal = normal.multComponents(t1xyz.step(t1zxy));
-
-		normal = boxToWorld.timesV(normal.addDim(0)).dropDim();
-
 		double time = tN;
 
 		if (time < info.getTime()) {
+			
+			Vector hitPoint = ray.atTime(time);
+			
+			Vector t1yzx = new Vector(t1.y(),t1.z(),t1.x());
+			Vector t1xyz = new Vector(t1.x(),t1.y(),t1.z());
+			Vector t1zxy = new Vector(t1.z(),t1.x(),t1.y());
 
-			info.setTime(tN);
-			Vector hitPoint = ray.atTime(tN);
-			info.setHitPoint(hitPoint);
+			Vector normal = rayDirectionBS.sign().timesConst(-1);
+			normal = normal.multComponents(t1xyz.step(t1yzx));
+			normal = normal.multComponents(t1xyz.step(t1zxy));
 
-			info.setNormal(normal);
-			info.setMaterial(this.material);
-
-			if (this.hasTextureMap) {
-				Vector color = this.getUVcolor(this.calcUV(hitPoint));
-				info.setUVcolor(color);
-			}
-			else {
-				info.setHasNoUV();
-			}
-
-			info.setObject(this);
-			info.setObjectName(this.name);
+			normal = boxToWorld.timesV(normal.addDim(0)).dropDim();
+			
+			info.updateInfo(time, hitPoint, normal, this);
 
 		}
 

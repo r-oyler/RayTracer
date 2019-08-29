@@ -12,7 +12,7 @@ public class Capsule extends MatObject {
 	}
 
 	@Override
-	// http://www.iquilezles.org/www/articles/intersectors/intersectors.htm
+	// https://www.shadertoy.com/view/ld23DV
 	boolean Intersect(Ray ray, IntersectInfo info) {
 
 		Vector span = this.p1.minus(p0);
@@ -41,15 +41,16 @@ public class Capsule extends MatObject {
 				// body
 				if (y > 0 && y < span_span) {
 
-					Vector hitPoint = ray.atTime(time);
+					if (time < info.getTime()) {
 
-					Vector cToHit = hitPoint.minus(this.p0);
+						Vector hitPoint = ray.atTime(time);
+						Vector cToHit = hitPoint.minus(this.p0);
+						double h1 = Util.clamp((cToHit.dotProduct(span)/span.dotSelf()), 0, 1);
+						Vector normal = cToHit.minus(span.timesConst(h1)).divide(this.radius);
 
-					double h1 = Util.clamp((cToHit.dotProduct(span)/span.dotSelf()), 0, 1);
+						info.updateInfo(time, hitPoint, normal, this);
 
-					Vector normal = cToHit.minus(span.timesConst(h1)).divide(this.radius);
-
-					info.updateInfo(time, hitPoint, normal, this);
+					}
 
 					return true;
 
@@ -72,15 +73,19 @@ public class Capsule extends MatObject {
 
 				if (time > 0) {
 
-					Vector hitPoint = ray.atTime(time);
+					if (time < info.getTime()) {
 
-					Vector cToHit = hitPoint.minus(this.p0);
+						Vector hitPoint = ray.atTime(time);
 
-					double h1 = Util.clamp((cToHit.dotProduct(span)/span.dotSelf()), 0, 1);
+						Vector cToHit = hitPoint.minus(this.p0);
 
-					Vector normal = cToHit.minus(span.timesConst(h1)).divide(this.radius);
+						double h1 = Util.clamp((cToHit.dotProduct(span)/span.dotSelf()), 0, 1);
 
-					info.updateInfo(time, hitPoint, normal, this);
+						Vector normal = cToHit.minus(span.timesConst(h1)).divide(this.radius);
+
+						info.updateInfo(time, hitPoint, normal, this);
+
+					}
 
 					return true;
 
