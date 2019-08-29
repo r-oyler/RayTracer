@@ -134,6 +134,15 @@ public class Triangle extends MatObject {
 			info.setHitPoint(ray.atTime(time));
 			info.setNormal(this.normal);
 			info.setMaterial(this.material);
+			
+			if (this.hasTextureMap) {
+            	Vector color = this.getUVcolor(this.calcUV(hitPoint));
+    			info.setUVcolor(color);
+            }
+            else {
+            	info.setHasNoUV();
+            }
+			
 			info.setObject(this);
 			info.setObjectName(this.name);
 			

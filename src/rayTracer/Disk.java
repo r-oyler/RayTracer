@@ -38,10 +38,21 @@ public class Disk extends MatObject {
 			}
 
 			if (planeInfo.time < info.getTime()) { // if this intersection is the closest so far (or first)        	
+				Vector hitPoint = ray.atTime(planeInfo.time);
+				
 				info.setTime(planeInfo.time);
-				info.setHitPoint(ray.atTime(planeInfo.time));
+				info.setHitPoint(hitPoint);
 				info.setNormal(this.normal);
 				info.setMaterial(this.material);
+				
+				if (this.hasTextureMap) {
+	            	Vector color = this.getUVcolor(this.calcUV(hitPoint));
+	    			info.setUVcolor(color);
+	            }
+	            else {
+	            	info.setHasNoUV();
+	            }
+				
 				info.setObject(this);
 				info.setObjectName(this.name);
 			}

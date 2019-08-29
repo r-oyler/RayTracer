@@ -49,10 +49,10 @@ public class RayTracer {
 		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 21, 0, 21);
+		int sceneNum = Input.getInt("Scene number", 23, 0, 23);
 		
 		double totalTime = 1.0;
-		int totalFrames = 30;
+		int totalFrames = 1;
 		double deltaTperFrame = totalTime/totalFrames; 
 
 		for(int frame = 0; frame < totalFrames; frame++ ){
@@ -64,7 +64,7 @@ public class RayTracer {
 			// The ambient light that is cast on every object
 			scene.setAmbientLight(new Vector(40f,40f,40f));
 			// The color that is seen when a ray doesn't hit an object;
-			scene.setBackgroundColor(new Vector(20f,0f,20f));;
+			scene.setBackgroundColor(new Vector(10,10,10));
 			
 			scene.setScene(sceneNum, time);
 
@@ -208,7 +208,7 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 
-						if (column == 1366/2 && row == 768/2) {
+						if (column == 657 && row == 410) {
 							System.out.print("");
 						}
 
@@ -251,6 +251,7 @@ public class RayTracer {
 	static double CastRay(Ray ray, Payload payload, Settings settings, Scene scene){
 
 		if (payload.getNumBounces() > settings.getMaxRecursionDepth()) { //Return if max depth reached
+			payload.Color = scene.backgroundColor;
 			return 0f;
 		}
 
@@ -428,7 +429,7 @@ public class RayTracer {
 			return info.getTime();
 
 		}
-
+		payload.Color = scene.backgroundColor;
 		return 0.0f;
 	}
 

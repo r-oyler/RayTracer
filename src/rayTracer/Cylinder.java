@@ -12,68 +12,58 @@ public class Cylinder extends MatObject {
 	}
 
 	@Override
-	// http://iquilezles.org/www/articles/intersectors/intersectors.htm
+	// https://www.shadertoy.com/view/4lcSRn
 	boolean Intersect(Ray ray, IntersectInfo info) {
 
-		Vector endA = this.p0;
+		Vector pa = this.p0;
+		Vector pb = this.endB;
+		Vector ro = ray.origin;
+		Vector rd = ray.direction;
+		double ra = this.radius;
 
-		Vector span = endB.minus(endA);
-		Vector endAToR = ray.origin.minus(endA);
+		Vector ba = pb.minus(pa);
 
-		double span_span = span.dotProduct(span);
-		double span_rD = span.dotProduct(ray.direction);
-		double span_endAToR = span.dotProduct(endAToR);
+		Vector oc = ro.minus(pa);
 
-		double a = span_span - span_rD * span_rD;
-		double b = span_span * endAToR.dotProduct(ray.direction) - (span_endAToR * span_rD);
-		double c = span_span * endAToR.dotProduct(endAToR) - (span_endAToR * span_endAToR) - (this.radius*this.radius*span_span);
+		double baba = ba.dotSelf();
+		double bard = ba.dotProduct(rd);
+		double baoc = ba.dotProduct(oc);
 
-		double h = b*b - a*c;
+		double k2 = baba            - bard*bard;
+		double k1 = baba*oc.dotProduct(rd) - baoc*bard;
+		double k0 = baba*oc.dotSelf() - baoc*baoc - ra*ra*baba;
 
-		if (h < 0) {
-			return false;
-		}
-
+		double h = k1*k1 - k2*k0;
+		if( h<0.0 ) return false;
 		h = Math.sqrt(h);
+		double t = (-k1-h)/k2;
 
-		double time = (-b-h)/a;
+		// body
+		double y = baoc + t*bard;
+		if( y>0.0 && y<baba ) {
 
-		double y = span_endAToR + time*span_rD;
+			if (t > 0) {
+				Vector hitPoint = ray.atTime(t);
+				Vector normal = (rd.timesConst(t).plus(oc).minus(ba.timesConst(y/baba))).divide(ra);
 
-		if (time > 0) {
-
-			// body
-			if (y > 0 && y < span_span) {
-
-				Vector hitPoint = ray.atTime(time);
-
-				Vector normal = endAToR.plus((hitPoint).minus(span.timesConst(y/span_span)).divide(this.radius));
-
-				info.updateInfo(time, hitPoint, normal, this);
+				info.updateInfo(t, hitPoint, normal, this);
 
 				return true;
-
 			}
-
 		}
 
 		// caps
-		time = (((y<0.0)?0.0:span_span) - span_endAToR)/span_rD;
-
-		if (time > 0) {
-
-			if (Math.abs(b+a*time) < h) {
-
-				Vector hitPoint = ray.atTime(time);
-
-				Vector normal = span.timesConst(Util.sign(y)/span_span).normalize();
-
-				info.updateInfo(time, hitPoint, normal, this);
-
+		t = ( ((y<0.0) ? 0.0 : baba) - baoc)/bard;
+		if( Math.abs(k1+k2*t)<h )
+		{
+			if (t > 0) {
+				Vector hitPoint = ray.atTime(t);
+				Vector normal =  ba.timesConst(Util.sign(y/baba));
+				
+				info.updateInfo(t, hitPoint, normal, this);
+				
 				return true;
-
 			}
-
 		}
 
 		return false;
@@ -83,6 +73,10 @@ public class Cylinder extends MatObject {
 	Vector calcUV(Vector hitPoint) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public Vector centre() {
+		return this.p0.plus(this.endB.minus(p0).timesConst(0.5));
 	}
 
 	@Override

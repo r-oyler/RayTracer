@@ -514,7 +514,127 @@ public class Scene {
 			break;
 			
 		}
+		
+		case 22:{
+			
+			Plane p = new Plane(new Vector(0,0,0), Material.TEXTURE, new Vector(0,1,0));
+			p.addTextureMap("textures\\checkerboard.png");
+			this.addObject(p);
+			
+			Sphere s = new Sphere(new Vector(0,1,0), Material.BLUE, 1);
+			this.addObject(s);
+			
+			Triangle t = new Triangle(new Vector(2,0,0), new Vector(2,2,-1), new Vector(4,0,0), Material.BLUE);
+			this.addObject(t);
+			
+			Disk d = new Disk(new Vector(-3,1,0), Material.BLUE, new Vector(0,1,1), 1);
+			this.addObject(d);
+			
+			Cone c = new Cone(new Vector(-3,1,-3), Material.RED, new Vector(-1,1,-3), 0.5, 1);
+			this.addObject(c);
+			
+			Cylinder cyl = new Cylinder(new Vector(3,1,-3), Material.RED, new Vector(1,1,-3), 1);
+			this.addObject(cyl);
+			
+			Capsule cap = new Capsule(new Vector(5,1,-3), Material.RED, new Vector(7,1,-3), 1);
+			this.addObject(cap);
+			
+			AABB aabb = new AABB(new Vector(-5,1,-3), Material.RED, new Vector(1,1,1));
+			this.addObject(aabb);
+			
+			RoundedBox rb = new RoundedBox(new Vector(-2,1,3), Material.GREEN, new Vector(0.75,0.75,0.75), 0.25);
+			this.addObject(rb);
+			
+			Ellipsoid e = new Ellipsoid(new Vector(1,1,3), Material.GREEN, new Vector(0.75,1,0.25));
+			this.addObject(e);
+			
+			Torus tor = new Torus(new Vector(-5,1.5,3), Material.GREEN, 1, 0.5);
+			this.addObject(tor);
+			
+			Sphere4 s4 = new Sphere4(new Vector(3,1,3), Material.GREEN, 1);
+			this.addObject(s4);
+			
+			Vector camPos = new Vector(0,6,10);
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+			
+			Vector lightPos = camPos;
+			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
 
+			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,1,0), new Vector(0,1,0)));
+
+			break;
+			
+		}
+
+		case 23:{
+			
+			Cylinder c = new Cylinder(new Vector(0,0,0), Material.WATER, new Vector(0,5,0), 2);
+			this.addObject(c);
+			
+			Vector top = new Vector(1.5,6,0.2);
+			Vector direction = new Vector(-3.0, -5.5, -0.2);
+			Vector pencil_end = top.plus(direction.timesConst(0.8));
+			
+			Vector wood_end = top.plus(direction.timesConst(0.9));
+			Vector lead_end = top.plus(direction);
+			
+			Material pencil = new Material("pencil");
+			pencil.setAmbient(new Vector(245,171,11).divide(255));
+			pencil.setDiffuse(new Vector(245,171,11).divide(255));
+			pencil.setSpecular(new Vector(0.7,0.7,0.7),200);
+			
+			Cylinder c1 = new Cylinder(top, pencil, pencil_end, 0.25);
+			this.addObject(c1);
+			
+			Material wood = new Material("wood");
+			wood.setAmbient(new Vector(229,212,202).divide(255));
+			wood.setDiffuse(new Vector(229,212,202).divide(255));
+			
+			Cone c2 = new Cone(pencil_end, wood, wood_end, 0.25, 0.1);
+			this.addObject(c2);
+			
+			Material lead = new Material("lead");
+			lead.setAmbient(new Vector(142,145,162).divide(255));
+			lead.setDiffuse(new Vector(142,145,162).divide(255));
+			lead.setSpecular(new Vector(0.7,0.7,0.7),200);
+			
+			Cone c3 = new Cone(wood_end, lead, lead_end, 0.1, 0);
+			this.addObject(c3);
+			
+			Vector metal_end = top.minus(direction.timesConst(0.08));
+			Vector rubber_end = top.minus(direction.timesConst(0.12));
+			
+			Material metal = new Material("metal");
+			metal.setAmbient(new Vector(113,117,129).divide(255));
+			metal.setDiffuse(new Vector(113,117,129).divide(255));
+			metal.setSpecular(new Vector(0.7,0.7,0.7),200);
+			
+			Cylinder c4 = new Cylinder(top, metal, metal_end, 0.25);
+			this.addObject(c4);
+			
+			Material rubber = new Material("rubber");
+			rubber.setAmbient(new Vector(214,101,97).divide(255));
+			rubber.setDiffuse(new Vector(214,101,97).divide(255));
+			
+			Cylinder c5 = new Cylinder(metal_end, rubber, rubber_end, 0.25);
+			this.addObject(c5);
+			
+			Plane p = new Plane(new Vector(0,0,0), Material.GREY, new Vector(0,1,0));
+			this.addObject(p);
+			
+			Vector camPos = new Vector(0,8,6);
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+			
+			Vector lightPos = new Vector(-50,100,40);
+			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+
+			this.setViewMatrix(Matrix4.lookAt(camPos, c.centre(), new Vector(0,1,0)));
+
+			
+			break;
+			
+		}
+		
 		}
 
 	}

@@ -53,6 +53,7 @@ public class InfCylinder extends MatObject {
         	double hitToC_cDir = hitToC.dotProduct(this.direction);
         	double cDir_cDir = this.direction.dotSelf();
         	
+        	// TODO: Fix
         	Vector normal = this.p0.minus(this.direction.timesConst(hitToC_cDir/cDir_cDir)).plus(hitPoint);        	
         	
         	info.setTime(time);

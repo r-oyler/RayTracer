@@ -80,6 +80,7 @@ public class Material {
 	static Material BLUE = new Material("BLUE");
 	static Material YELLOW = new Material("YELLOW");
 	static Material BLACK = new Material("BLACK");
+	static Material GREY = new Material("GREY");
 	static Material MIRROR = new Material("MIRROR");
 	static Material TEXTURE = new Material("TEXTURE");
 	
@@ -118,12 +119,16 @@ public class Material {
 		BLACK.setDiffuse(new Vector(0.2,0.2,0.2));
 		BLACK.setSpecular(new Vector(0.7,0.7,0.7), 200);
 
+		GREY.setAmbient(new Vector(0.3,0.3,0.3));
+		GREY.setDiffuse(new Vector(0.3,0.3,0.3));
+		GREY.setSpecular(new Vector(0.7,0.7,0.7), 200);
+		
 		MIRROR.setReflective(0.8, new Vector(1,1,1));
 		
 		TEXTURE.setAmbient(new Vector(1,1,1));
 		TEXTURE.setDiffuse(new Vector(1,1,1));
 		
-		WATER.setRefractive(1.333, new Vector(1,1,1));
+		WATER.setRefractive(1.333, new Vector(0.9,0.9,1));
 		GLASS.setRefractive(1.52, new Vector(1,1,1));
 		DIAMOND.setRefractive(2.42, new Vector(1,1,1));
 		SAPPHIRE.setRefractive(1.765, new Vector(0.059,0.322,0.729));

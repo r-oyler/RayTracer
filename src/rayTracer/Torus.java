@@ -129,8 +129,8 @@ public class Torus extends MatObject {
 		Vector t1 = new Vector(d-r2,d-r2,d-r2);
 		Vector t2 = v.timesConst(R2);
 
-		return hitPointOS.multComponents(t1.minus(t2));
-
+		return hitPointOS.multComponents(t1.minus(t2)).normalize();
+		
 	}
 
 	@Override
