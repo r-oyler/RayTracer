@@ -87,10 +87,10 @@ public class Scene {
 		
 		case 2:{
 
-			AABB aabb = new AABB(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
-			AABB aabb2 = new AABB(new Vector(5,1,1), Material.BLUE, new Vector(1,1,1));
-			AABB aabb3 = new AABB(new Vector(1,5,1), Material.YELLOW, new Vector(1,1,1));
-			AABB aabb4 = new AABB(new Vector(1,1,5), Material.GREEN, new Vector(1,1,1));
+			Box aabb = new Box(new Vector(1,1,1), Material.RED, new Vector(1,1,1));
+			Box aabb2 = new Box(new Vector(5,1,1), Material.BLUE, new Vector(1,1,1));
+			Box aabb3 = new Box(new Vector(1,5,1), Material.YELLOW, new Vector(1,1,1));
+			Box aabb4 = new Box(new Vector(1,1,5), Material.GREEN, new Vector(1,1,1));
 
 			Vector camPos = new Vector(8,8,8);
 			Vector lightPos = camPos;
@@ -108,10 +108,10 @@ public class Scene {
 
 		case 3:{
 
-			AABB aabb = new AABB(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
-			AABB aabb2 = new AABB(new Vector(2,0,0), Material.BLUE, new Vector(0.5,0.5,0.5));
-			AABB aabb3 = new AABB(new Vector(0,2,0), Material.YELLOW, new Vector(0.5,0.5,0.5));
-			AABB aabb4 = new AABB(new Vector(0,0,2), Material.GREEN, new Vector(0.5,0.5,0.5));
+			Box aabb = new Box(new Vector(0,0,0), Material.RED, new Vector(1,1,1));
+			Box aabb2 = new Box(new Vector(2,0,0), Material.BLUE, new Vector(0.5,0.5,0.5));
+			Box aabb3 = new Box(new Vector(0,2,0), Material.YELLOW, new Vector(0.5,0.5,0.5));
+			Box aabb4 = new Box(new Vector(0,0,2), Material.GREEN, new Vector(0.5,0.5,0.5));
 
 
 			Vector camPos = new Vector(8,8,8);
@@ -268,7 +268,7 @@ public class Scene {
 			Capsule cap = new Capsule(new Vector(5,1,-3), Material.RED, new Vector(7,1,-3), 1);
 			this.addObject(cap);
 			
-			AABB aabb = new AABB(new Vector(-5,1,-3), Material.RED, new Vector(1,1,1));
+			Box aabb = new Box(new Vector(-5,1,-3), Material.RED, new Vector(1,1,1));
 			this.addObject(aabb);
 			
 			RoundedBox rb = new RoundedBox(new Vector(-2,1,3), Material.GREEN, new Vector(0.75,0.75,0.75), 0.25);
@@ -359,6 +359,26 @@ public class Scene {
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, c.centre(), new Vector(0,1,0)));
 
+			break;
+			
+		}
+		
+		case 10:{
+			
+			PolyMesh pm = PolyMesh.ReadFile("geo\\cow.geo", Material.BLUE);
+			TriangleMesh tm = pm.GenerateTriangleMesh();
+						
+			objects.add(tm);
+			
+			Vector centre = tm.centre();
+			
+			Vector camPos = centre.plus(new Vector(0,0,15));
+
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(90)).timesV(camPos.addDim(1)).dropDim();
+			
+			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+			
+			this.setViewMatrix(Matrix4.lookAt(camPos, centre, new Vector(0,1,0)));
 			
 			break;
 			

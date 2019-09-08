@@ -288,8 +288,22 @@ public class Vector {
 	}
 
 	public double z() {
-		if(this.dim < 2) throw new IllegalArgumentException("Cannot return z value from vector with " + this.dim + " dimensions");
+		if(this.dim < 3) throw new IllegalArgumentException("Cannot return z value from vector with " + this.dim + " dimensions");
 		return this.d[2];
+	}
+	
+	public void setX(double d) {
+		this.d[0] = d;
+	}
+	
+	public void setY(double d) {
+		if(this.dim < 2) throw new IllegalArgumentException("Cannot set y value from vector with " + this.dim + " dimensions");
+		this.d[1] = d;
+	}
+	
+	public void setZ(double d) {
+		if(this.dim < 3) throw new IllegalArgumentException("Cannot set z value from vector with " + this.dim + " dimensions");
+		this.d[2] = d;
 	}
 
 	public boolean elementsBetweenInc(double min, double max) {

@@ -1,79 +1,40 @@
 package rayTracer;
 
-public class AABB extends MatObject {
+public class AABB {
 
-	// Used for naming object
-	static int count = 0;
-
-	Vector boxSize;
-
-	AABB(Vector p, Material m, Vector boxSize) {
-		super(p, m);
-
-		this.boxSize = boxSize;
-
-		count++;
-		this.name = "AABB " + count;
-
+	Vector[] bounds = new Vector[2];
+	
+	AABB(Vector minBounds, Vector maxBounds) {
+		this.bounds[0] = minBounds;
+		this.bounds[1] = maxBounds;
 	}
 
-	@Override
-	// Source: https://www.shadertoy.com/view/tl23Rm http://iquilezles.org/www/articles/boxfunctions/boxfunctions.htm
-	boolean Intersect(Ray ray, IntersectInfo info) {
-
-		Matrix4 boxToWorld = this.transform;
-		Matrix4 worldToBox = Invert.invert(boxToWorld);
-
-		// convert from world to box space
-		Vector rayDirectionBS = worldToBox.timesV(ray.direction.addDim(0)).dropDim();
-		Vector rayOriginBS = worldToBox.timesV(ray.origin.addDim(1)).dropDim(); 
-
-		Vector m = rayDirectionBS.sign().divComponents(rayDirectionBS.absolute());
-		Vector n = m.multComponents(rayOriginBS);
-		Vector k = m.absolute().multComponents(this.boxSize);
-		Vector t1 = n.timesConst(-1).minus(k);
-		Vector t2 = n.timesConst(-1).plus(k);
-
-		double tN = Math.max( Math.max( t1.x(), t1.y() ), t1.z() );
-		double tF = Math.min( Math.min( t2.x(), t2.y() ), t2.z() );
-		if( tN>tF || tF<=0.0) {
-			return false; // no intersection
-		}
-
-		double time = tN;
-
-		if (time < info.getTime()) {
-			
-			Vector hitPoint = ray.atTime(time);
-			
-			Vector t1yzx = new Vector(t1.y(),t1.z(),t1.x());
-			Vector t1xyz = new Vector(t1.x(),t1.y(),t1.z());
-			Vector t1zxy = new Vector(t1.z(),t1.x(),t1.y());
-
-			Vector normal = rayDirectionBS.sign().timesConst(-1);
-			normal = normal.multComponents(t1xyz.step(t1yzx));
-			normal = normal.multComponents(t1xyz.step(t1zxy));
-
-			normal = boxToWorld.timesV(normal.addDim(0)).dropDim();
-			
-			info.updateInfo(time, hitPoint, normal, this);
-
-		}
-
+	public boolean intersect(Ray r) {
+		
+		double tmin, tmax, tymin, tymax, tzmin, tzmax;
+		
+		tmin = (bounds[r.sign[0]].x() - r.origin.x()) * r.invDirection.x();
+		tmax = (bounds[1-r.sign[0]].x() - r.origin.x()) * r.invDirection.x();
+		tymin = (bounds[r.sign[1]].y() - r.origin.y()) * r.invDirection.y();
+		tymax = (bounds[1-r.sign[1]].y() - r.origin.y()) * r.invDirection.y();
+		
+		if ((tmin > tymax) || (tymin > tmax)) return false;
+		
+		if (tymin > tmin) tmin = tymin;
+		if (tymax < tmax) tmax = tymax;
+		
+		tzmin = (bounds[r.sign[2]].z() - r.origin.z()) * r.invDirection.z();
+		tzmax = (1-bounds[r.sign[2]].z() - r.origin.z()) * r.invDirection.z();
+		
+		if ((tmin > tzmax) || (tzmin > tmax)) return false;
+		
+		if (tzmin > tmin) tmin = tzmin;
+		if (tzmax < tmax) tmax = tzmax;
+		
 		return true;
+		
 	}
-
-	@Override
-	Vector calcUV(Vector hitPoint) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public AABB clone() {
-		AABB clone = new AABB(this.p0.clone(),this.material.clone(),this.boxSize.clone());
-		clone.transform = this.transform;
-		return clone;
-	}
-
+	
+	
+	
 }

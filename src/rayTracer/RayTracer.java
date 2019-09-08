@@ -29,7 +29,7 @@ public class RayTracer {
 
 			settings.setMultithreading(true);
 			// Dimensions of image
-			settings.setWindowXY(1366, 768);
+			settings.setWindowXY(1366/4, 768/4);
 			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
 			settings.setFov(90);
 
@@ -49,9 +49,9 @@ public class RayTracer {
 		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 9, 1, 9);
+		int sceneNum = Input.getInt("Scene number", 10, 1, 10);
 		
-		double totalTime = 1.0;
+		double totalTime = 1;
 		int totalFrames = 1;
 		double deltaTperFrame = totalTime/totalFrames; 
 
@@ -124,8 +124,8 @@ public class RayTracer {
 			int totalSubpixels = totalPixels * settings.getTotalSubPixels();
 
 			System.out.println("Total pixels: " + totalPixels);
-			System.out.println("Pixels per second (per thread): " + totalPixels / elapsedTime + " (" + ((totalPixels / elapsedTime)/processors) + ")");
-			System.out.println("Subpixels per second (per thread): " + totalSubpixels / elapsedTime + " (" + ((totalSubpixels / elapsedTime)/processors) + ")");
+			System.out.println("Pixels per second (per thread): " + totalPixels / (float)elapsedTime + " (" + ((totalPixels / (float)elapsedTime)/processors) + ")");
+			System.out.println("Subpixels per second (per thread): " + totalSubpixels / (float)elapsedTime + " (" + ((totalSubpixels / (float)elapsedTime)/processors) + ")");
 
 		}
 
@@ -204,7 +204,11 @@ public class RayTracer {
 						payload.setNumBounces(0);
 
 						Vector color = scene.getBackgroundColor();
-
+						
+//						if (column == settings.windowX/2 && row == settings.windowY/2) {
+//							System.out.println();
+//						}
+						
 						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
