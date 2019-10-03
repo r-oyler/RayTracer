@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
 import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
@@ -29,7 +28,7 @@ public class RayTracer {
 
 			settings.setMultithreading(true);
 			// Dimensions of image
-			settings.setWindowXY(1366/4, 768/4);
+			settings.setWindowXY(1366, 768);
 			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
 			settings.setFov(90);
 
@@ -49,7 +48,7 @@ public class RayTracer {
 		String directoryName = "gif";
 
 		// Switch statement to have multiple scene setups
-		int sceneNum = Input.getInt("Scene number", 10, 1, 10);
+		int sceneNum = Input.getInt("Scene number", 12, 1, 12);
 		
 		double totalTime = 1;
 		int totalFrames = 1;
@@ -67,7 +66,7 @@ public class RayTracer {
 			scene.setBackgroundColor(new Vector(10,10,10));
 			
 			scene.setScene(sceneNum, time);
-
+			
 			long startTime = System.currentTimeMillis();
 
 			BufferedImage img = null;
@@ -209,7 +208,7 @@ public class RayTracer {
 //							System.out.println();
 //						}
 						
-						if(CastRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
+						if(castRay(ray,payload, settings, scene)>0.0){// > 0.0f indicates an intersection
 							color = payload.getColor();
 						}
 
@@ -245,7 +244,7 @@ public class RayTracer {
 	//@ray The ray we are casting
 	//@payload Information on the current ray i.e. the cumulative color and the number of bounces it has performed
 	//returns either the time of intersection with an object (the coefficient t in the equation: RayPosition = RayOrigin + t*RayDirection) or zero to indicate no intersection
-	static double CastRay(Ray ray, Payload payload, Settings settings, Scene scene){
+	static double castRay(Ray ray, Payload payload, Settings settings, Scene scene){
 
 		if (payload.getNumBounces() > settings.getMaxRecursionDepth()) { //Return if max depth reached
 			payload.Color = scene.backgroundColor;
@@ -358,7 +357,7 @@ public class RayTracer {
 				reflectionPayload.setNumBounces(payload.numBounces+1);
 
 				// Reflection ray is cast 
-				CastRay(reflectionRay, reflectionPayload, settings, scene);
+				castRay(reflectionRay, reflectionPayload, settings, scene);
 
 				reflection = reflectionPayload.Color.timesConst(info.getMaterial().reflectionCoefficient);
 
@@ -388,7 +387,7 @@ public class RayTracer {
 					Payload refractionPayload = new Payload();
 					refractionPayload.setNumBounces(payload.numBounces+1);
 
-					CastRay(refractionRay, refractionPayload, settings, scene);
+					castRay(refractionRay, refractionPayload, settings, scene);
 
 					Vector refraction = refractionPayload.Color.timesConst(1-kReflect);
 
@@ -407,7 +406,7 @@ public class RayTracer {
 				Payload reflectionPayload = new Payload();
 				reflectionPayload.setNumBounces(payload.numBounces+1);
 
-				CastRay(reflectionRay, reflectionPayload, settings, scene);
+				castRay(reflectionRay, reflectionPayload, settings, scene);
 
 				Vector reflection = reflectionPayload.Color.timesConst(kReflect);
 

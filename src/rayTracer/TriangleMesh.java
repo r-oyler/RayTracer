@@ -90,6 +90,16 @@ public class TriangleMesh extends MatObject {
 
 	}
 
+	public void applyTransform(Matrix4 m) {
+		
+		for (int i=0; i<vertices.length; i++) {
+			vertices[i] = m.timesVPoint(vertices[i]);
+		}
+		
+		findBounds();
+		
+	}
+	
 	@Override
 	public TriangleMesh clone() {
 
