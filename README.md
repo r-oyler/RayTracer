@@ -29,4 +29,4 @@ Ellipsoid
 Torus - Torus erronously casts shadows on itself 
 Sphere4
 
-![Alt text](saved_outputs\pencil.gif?raw=true "Pencil")
+!(saved_outputs\pencil.gif "Pencil")
