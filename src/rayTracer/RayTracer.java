@@ -51,7 +51,7 @@ public class RayTracer {
 		int sceneNum = Input.getInt("Scene number", 12, 1, 12);
 		
 		double totalTime = 1;
-		int totalFrames = 90;
+		int totalFrames = 1;
 		double deltaTperFrame = totalTime/totalFrames; 
 
 		for(int frame = 0; frame < totalFrames; frame++ ){
@@ -204,7 +204,7 @@ public class RayTracer {
 
 						Vector color = scene.getBackgroundColor();
 						
-//						if (column == settings.windowX/2 && row == settings.windowY/2) {
+//						if (column == 777 && row == 387) {
 //							System.out.println();
 //						}
 						

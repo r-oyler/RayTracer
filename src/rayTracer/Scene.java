@@ -253,7 +253,7 @@ public class Scene {
 			Sphere s = new Sphere(new Vector(0,1,0), Material.BLUE, 1);
 			this.addObject(s);
 
-			Triangle t = new Triangle(new Vector(2,0,0), new Vector(2,2,-1), new Vector(4,0,0), Material.BLUE);
+			Triangle t = new Triangle(new Vector(2,2,-1), new Vector(2,0,0), new Vector(4,0,0), Material.BLUE);
 			this.addObject(t);
 
 			Disk d = new Disk(new Vector(-3,1,0), Material.BLUE, new Vector(0,1,1), 1);
