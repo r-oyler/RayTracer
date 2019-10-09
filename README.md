@@ -2,7 +2,24 @@
 
 ## Outline
 
-A ray tracer written in Java
+A ray tracer written in Java.
+
+## Compiling
+
+Clone or download the project.
+In the project directory (contains README.md, src)
+Run:
+```
+javac src/rayTracer/*.java -d classes
+```
+
+## Running
+
+In the same directory
+Run:
+```
+java -cp classes rayTracer/RayTracer
+```
 
 ## Features  
   
