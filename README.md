@@ -1,5 +1,9 @@
 # RayTracer
 
+## Outline
+
+A ray tracer written in Java
+
 ## Features  
   
 Ambient, diffuse, specular, reflective and refractive materials  
@@ -7,7 +11,7 @@ Grid supersampling anti-aliasing
 Animation generation  
 Multithreading  
   
-Possible future features:  
+## Possible future features  
 More UV mapping  
 Input file parsing  
   
