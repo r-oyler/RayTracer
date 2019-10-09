@@ -19,17 +19,13 @@ Triangle
 Disk  
 Cone  
 Cylinder  
-Infinite Cylinder - Normal calculation is incorrect  
 Capsule  
-  
-Intersections are performed with object at origin and aligned to axes  
-Ray origins and directions are multiplied by the objects inverse transform  
-  
 AABB  
 RoundedBox  
 Ellipsoid  
-Torus - Torus erronously casts shadows on itself  
 Sphere4  
-  
+Infinite Cylinder - Normal calculation is incorrect 
+Torus - Torus erronously casts shadows on itself   
+    
 ## Example Output 
 ![Pencil](saved_outputs/pencil.gif "Pencil")
