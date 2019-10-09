@@ -95,12 +95,6 @@ public class Util {
 
 	}
 
-	public static double degreeToRadian(double degrees) {
-
-		return degrees * Math.PI/180.0;
-
-	}
-
 	public static BufferedImage deepCopy(BufferedImage bi) {
 		ColorModel cm = bi.getColorModel();
 		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
