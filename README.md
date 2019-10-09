@@ -7,16 +7,15 @@ A ray tracer written in Java.
 ## Compiling
 
 Clone or download the project.
-In the project directory (contains README.md, src)
-Run:
+In the project directory (contains README.md, src), run:
+
 ```
 javac src/rayTracer/*.java -d classes
 ```
 
 ## Running
 
-In the same directory
-Run:
+In the same directory, run:
 ```
 java -cp classes rayTracer/RayTracer
 ```
