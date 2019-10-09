@@ -1,30 +1,20 @@
 package rayTracer;
 
-
-public class Light extends Object{
+public abstract class Light{
 
 	// The color of the light
 	Vector color;
 
-	Light(Vector p, Vector c){
-		super(p);
-		color = c;
-	}
+	public abstract Vector DiffuseSpecular(Ray ray, IntersectInfo info, Scene scene, Settings settings);
 	
-	Vector Position() {
-		return new Vector(transform.d[0][3],transform.d[1][3],transform.d[2][3]);
-	}
-	
-	Vector getColor() {
+	public Vector getColor() {
 		return color;
 	}
-	
-	public static Vector randomColor() {
-		return new Vector(Math.random()*255,Math.random()*255,Math.random()*255);
+
+	public void setColor(Vector color) {
+		this.color = color;
 	}
 
-	public Light clone() {
-		return new Light(this.p0.clone(),this.color.clone());
-	}
-	
+	public abstract Light clone();
+
 }

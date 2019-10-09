@@ -79,7 +79,7 @@ public class Scene {
 			this.addObject(p1);
 			this.addObject(p2);
 			this.addObject(s);
-			this.addLight(new Light(ligPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,ligPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, s.Position(), new Vector(0,1,0)));
 			break;
@@ -99,7 +99,7 @@ public class Scene {
 			this.addObject(aabb2);
 			this.addObject(aabb3);
 			this.addObject(aabb4);
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
 
@@ -121,7 +121,7 @@ public class Scene {
 			this.addObject(aabb2);
 			this.addObject(aabb3);
 			this.addObject(aabb4);
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, aabb.p0, new Vector(0,1,0)));
 
@@ -153,7 +153,7 @@ public class Scene {
 			this.addObject(p1);
 			this.addObject(p2);
 			this.addObject(s);
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, s.p0, new Vector(0,1,0)));
 
@@ -179,7 +179,7 @@ public class Scene {
 			this.addObject(p1);
 			this.addObject(p2);
 			this.addObject(s);
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(1,1,1), new Vector(0,1,0)));
 
@@ -211,7 +211,7 @@ public class Scene {
 			this.addObject(s1);
 			this.addObject(s2);
 			this.addObject(s3);
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
 
@@ -237,7 +237,7 @@ public class Scene {
 			this.addObject(p1);
 			this.addObject(p2);
 			this.addObject(s0);
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(4,1,1), new Vector(0,1,0)));
 
@@ -287,7 +287,7 @@ public class Scene {
 			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
 
 			Vector lightPos = camPos;
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,1,0), new Vector(0,1,0)));
 
@@ -355,10 +355,12 @@ public class Scene {
 			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
 
 			Vector lightPos = new Vector(-50,100,40);
-			this.addLight(new Light(lightPos,PlanetPixel.DIRECT_SUNLIGHT));
-
+			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
+//			Vector lightDir = lightPos.timesConst(-1);
+//			this.addLight(new DistantLight(PlanetPixel.DIRECT_SUNLIGHT,lightDir));
+			
 			this.setViewMatrix(Matrix4.lookAt(camPos, c.centre(), new Vector(0,1,0)));
-
+			
 			break;
 
 		}
@@ -376,7 +378,7 @@ public class Scene {
 
 			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(90)).timesV(camPos.addDim(1)).dropDim();
 
-			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+			lights.add(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,camPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, centre, new Vector(0,1,0)));
 
@@ -402,7 +404,7 @@ public class Scene {
 
 			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(0)).timesV(camPos.addDim(1)).dropDim();
 
-			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+			lights.add(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,camPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,0,0), new Vector(0,1,0)));
 
@@ -417,7 +419,7 @@ public class Scene {
 			Vector camPos = new Vector(0,2,5);
 			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time * 360)).timesV(camPos.addDim(1)).dropDim();
 
-			lights.add(new Light(camPos,PlanetPixel.DIRECT_SUNLIGHT));
+			lights.add(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,camPos));
 
 			this.setViewMatrix(Matrix4.lookAt(camPos, new Vector(0,2,0), new Vector(0,1,0)));
 			

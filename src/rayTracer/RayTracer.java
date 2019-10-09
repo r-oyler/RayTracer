@@ -45,13 +45,13 @@ public class RayTracer {
 		Scene scene;
 
 		String outputFileName = Input.getString("Output file name", "saved");
-		String directoryName = "gif";
+		String directoryName = "frames";
 
 		// Switch statement to have multiple scene setups
 		int sceneNum = Input.getInt("Scene number", 12, 1, 12);
 		
 		double totalTime = 1;
-		int totalFrames = 1;
+		int totalFrames = 90;
 		double deltaTperFrame = totalTime/totalFrames; 
 
 		for(int frame = 0; frame < totalFrames; frame++ ){

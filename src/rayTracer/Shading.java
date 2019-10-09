@@ -23,77 +23,14 @@ public class Shading {
 		
 		for (Light l: scene.getLights()) {
 
-			Vector objectToLight = l.Position().minus(info.getHitPoint());
-			double timeToLight = objectToLight.length();
-			objectToLight = objectToLight.normalize();
-			Ray shadowRay = new Ray(info.getHitPoint().plus(info.getNormal().timesConst(settings.getBias())), objectToLight);
-			IntersectInfo shadowRayInfo = new IntersectInfo();
-			shadowRayInfo.setTime(Double.POSITIVE_INFINITY);
-
-			for (MatObject obj : scene.getObjects()) {
-				if (!obj.material.isRefractive){	// Refractive materials don't cast shadows				
-					obj.Intersect(shadowRay, shadowRayInfo); // shadowRayInfo becomes info of nearest intersection, if any
-				}
-			}
-
-			if (shadowRayInfo.getTime()>=timeToLight) { // no intersections with objects occur between object and light
-
-				if (info.getMaterial().isDiffuse) {
-					Vector diffuse = diffuse(info, objectToLight, l);
-					illumination = illumination.plus(diffuse);
-				}
-
-				if (info.getMaterial().isSpecular) {
-					Vector specular = specular(info, objectToLight, l, ray);
-					illumination = illumination.plus(specular);
-				}
-			}
+			Vector diffuseSpecular = l.DiffuseSpecular(ray, info, scene, settings);
+			illumination = illumination.plus(diffuseSpecular);
 
 		}
 		
 		return illumination;
 		
 	}
-	
-	public static Vector diffuse(IntersectInfo info, Vector objectToLight, Light l) {
-		
-		// Diffuse illumination
-
-		Vector normal = info.getNormal();
-		double cosTheta = objectToLight.cosAngleBetween(normal);
-
-		cosTheta = Math.max(0, cosTheta);
-
-		Vector diffuse;
-
-		if (info.hasUV) {
-			diffuse = l.getColor().multComponents(info.getMaterial().diffuse.multComponents(info.getUVcolor())).timesConst(cosTheta);
-		}
-		else {
-			diffuse = l.getColor().multComponents(info.getMaterial().diffuse).timesConst(cosTheta);
-		}
-
-		return diffuse;
-		
-	}
-	
-	public static Vector specular(IntersectInfo info, Vector objectToLight, Light l, Ray ray) {
-		// Specular illumination
-
-		Vector objectToCamera = ray.direction.timesConst(-1).normalize(); // objectToCamera is the reverse of the original camera ray
-
-		Vector normal = info.getNormal();
-		Vector reflection = info.getNormal().timesConst(2).timesConst(normal.dotProduct(objectToLight)).minus(objectToLight);
-
-		double cosAngle = reflection.cosAngleBetween(objectToCamera);
-		cosAngle = Math.max(0, cosAngle);
-		cosAngle = Math.pow(cosAngle, info.getMaterial().specularExponent);
-
-		Vector specular = l.getColor().multComponents(info.getMaterial().specular).timesConst(cosAngle);
-
-		return specular;
-	}
-	
 	
 	public static Vector reflection(IntersectInfo info, Ray ray, Payload payload, Settings settings, Scene scene, Vector illumination) {
 		
