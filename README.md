@@ -28,7 +28,7 @@ AABB
 RoundedBox  
 Ellipsoid  
 Sphere4  
-Infinite Cylinder - Normal calculation is incorrect 
+Infinite Cylinder - Normal calculation is incorrect  
 Torus - Torus erronously casts shadows on itself   
     
 ## Example Output 
