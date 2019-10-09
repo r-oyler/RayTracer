@@ -1,4 +1,6 @@
-Features:  
+# RayTracer
+
+## Features  
   
 Ambient, diffuse, specular, reflective and refractive materials  
 Grid supersampling anti-aliasing  
@@ -9,7 +11,7 @@ Possible future features:
 More UV mapping  
 Input file parsing  
   
-Primitives:  
+## Primitives  
   
 Sphere  
 Plane  
@@ -29,4 +31,5 @@ Ellipsoid
 Torus - Torus erronously casts shadows on itself  
 Sphere4  
   
+## Example Output 
 ![Pencil](saved_outputs/pencil.gif "Pencil")
