@@ -25,8 +25,8 @@ public class Box extends MatObject {
 		Matrix4 worldToBox = Invert.invert(boxToWorld);
 
 		// convert from world to box space
-		Vector rayDirectionBS = worldToBox.timesV(ray.direction.addDim(0)).dropDim();
-		Vector rayOriginBS = worldToBox.timesV(ray.origin.addDim(1)).dropDim(); 
+		Vector rayDirectionBS = worldToBox.timesVDirection(ray.direction);
+		Vector rayOriginBS = worldToBox.timesVPoint(ray.origin); 
 
 		Vector m = rayDirectionBS.sign().divComponents(rayDirectionBS.absolute());
 		Vector n = m.multComponents(rayOriginBS);
@@ -54,7 +54,7 @@ public class Box extends MatObject {
 			normal = normal.multComponents(t1xyz.step(t1yzx));
 			normal = normal.multComponents(t1xyz.step(t1zxy));
 
-			normal = boxToWorld.timesV(normal.addDim(0)).dropDim();
+			normal = boxToWorld.timesVDirection(normal);
 			
 			info.updateInfo(time, hitPoint, normal, this);
 

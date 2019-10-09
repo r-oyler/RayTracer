@@ -22,8 +22,8 @@ public class RoundedBox extends MatObject{
 		Matrix4 worldToBox = Invert.invert(boxToWorld);
 
 		// convert from world to box space
-		Vector rayDirectionBS = worldToBox.timesV(ray.direction.addDim(0)).dropDim();
-		Vector rayOriginBS = worldToBox.timesV(ray.origin.addDim(1)).dropDim();
+		Vector rayDirectionBS = worldToBox.timesVDirection(ray.direction);
+		Vector rayOriginBS = worldToBox.timesVPoint(ray.origin);
 
 		// bounding box
 		Vector m = rayDirectionBS.inverseDivide(1);
@@ -64,7 +64,7 @@ public class RoundedBox extends MatObject{
 					Vector normalBS = this.calcNormal(hitPointBS);
 
 					Vector hitPoint = ray.atTime(time);
-					Vector normal = boxToWorld.timesV(normalBS.addDim(0)).dropDim();
+					Vector normal = boxToWorld.timesVDirection(normalBS);
 
 					info.updateInfo(time, hitPoint, normal, this);
 
@@ -154,7 +154,7 @@ public class RoundedBox extends MatObject{
 				Vector normalBS = this.calcNormal(hitPointBS);
 
 				Vector hitPoint = ray.atTime(time);
-				Vector normal = boxToWorld.timesV(normalBS.addDim(0)).dropDim();
+				Vector normal = boxToWorld.timesVDirection(normalBS);
 
 				info.updateInfo(time, hitPoint, normal, this);
 

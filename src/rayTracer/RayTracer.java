@@ -177,19 +177,15 @@ public class RayTracer {
 						pixelCameraX *= settings.getAspectRatio();
 
 						//Put pixel into camera space (offset by 1 unit along camera facing direction i.e. negative z axis)
-						Vector pixelCameraSpace = new Vector(pixelCameraX,pixelCameraY,-1.0,1.0);
+						Vector pixelCameraSpace = new Vector(pixelCameraX,pixelCameraY,-1);
 
 						//ray comes from camera origin
-						Vector rayOrigin = new Vector(0.0f,0.0f,0.0f,1.0f);
+						Vector rayOrigin = new Vector(0,0,0);
 
 						//Transform from camera space to world space
-						pixelCameraSpace = scene.getViewMatrix().timesV(pixelCameraSpace);
+						pixelCameraSpace = scene.getViewMatrix().timesVPoint(pixelCameraSpace);
 						//The origin of the ray we are casting
-						rayOrigin = scene.getViewMatrix().timesV(rayOrigin);
-
-						// Drop 4th dimension for rayOrigin and pixelCameraSpace
-						rayOrigin = rayOrigin.dropDim();
-						pixelCameraSpace = pixelCameraSpace.dropDim();
+						rayOrigin = scene.getViewMatrix().timesVPoint(rayOrigin);
 
 						//The direction the ray is travelling in
 						Vector rayDirection = pixelCameraSpace.minus(rayOrigin).normalize();

@@ -284,7 +284,7 @@ public class Scene {
 			this.addObject(s4);
 
 			Vector camPos = new Vector(0,6,10);
-			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesVPoint(camPos);
 
 			Vector lightPos = camPos;
 			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
@@ -352,7 +352,7 @@ public class Scene {
 			this.addObject(p);
 
 			Vector camPos = new Vector(0,8,6);
-			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesV(camPos.addDim(1)).dropDim();
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time*360)).timesVPoint(camPos);
 
 			Vector lightPos = new Vector(-50,100,40);
 			this.addLight(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,lightPos));
@@ -376,7 +376,7 @@ public class Scene {
 
 			Vector camPos = centre.plus(new Vector(0,0,15));
 
-			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(90)).timesV(camPos.addDim(1)).dropDim();
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(90)).timesVPoint(camPos);
 
 			lights.add(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,camPos));
 
@@ -402,7 +402,7 @@ public class Scene {
 
 			Vector camPos = new Vector(0,0,5);
 
-			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(0)).timesV(camPos.addDim(1)).dropDim();
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(0)).timesVPoint(camPos);
 
 			lights.add(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,camPos));
 
@@ -417,7 +417,7 @@ public class Scene {
 			Teapot.generateTeapot(objects);
 
 			Vector camPos = new Vector(0,2,5);
-			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time * 360)).timesV(camPos.addDim(1)).dropDim();
+			camPos = Matrix4.yRotationMatrix(Util.degreeToRadian(time * 360)).timesVPoint(camPos);
 
 			lights.add(new PointLight(PlanetPixel.DIRECT_SUNLIGHT,camPos));
 

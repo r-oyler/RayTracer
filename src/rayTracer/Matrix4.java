@@ -141,7 +141,7 @@ public class Matrix4 {
 
 		if (v.dim != 3) throw new IllegalArgumentException("Function is for Vectors of length 3");
 
-		Vector v1 = v.addDim(0);
+		Vector v1 = v.addDim(1);
 
 		return this.timesV(v1).dropDim();
 
@@ -151,7 +151,7 @@ public class Matrix4 {
 
 		if (v.dim != 3) throw new IllegalArgumentException("Function is for Vectors of length 3");
 
-		Vector v1 = v.addDim(1);
+		Vector v1 = v.addDim(0);
 
 		return this.timesV(v1).dropDim();
 

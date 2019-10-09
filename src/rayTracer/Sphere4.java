@@ -16,8 +16,8 @@ public class Sphere4 extends MatObject {
 		Matrix4 worldToObj = Invert.invert(objToWorld);
 
 		// convert from world to object space
-		Vector rayDirectionOS = worldToObj.timesV(ray.direction.addDim(0)).dropDim();
-		Vector rayOriginOS = worldToObj.timesV(ray.origin.addDim(1)).dropDim();
+		Vector rayDirectionOS = worldToObj.timesVDirection(ray.direction);
+		Vector rayOriginOS = worldToObj.timesVPoint(ray.origin);
 
 		// solve quartic equation
 
@@ -70,7 +70,7 @@ public class Sphere4 extends MatObject {
 			Vector normalOS = this.calcNormal(hitPointOS);
 
 			Vector hitPoint = ray.atTime(time);
-			Vector normal = objToWorld.timesV(normalOS.addDim(0)).dropDim();
+			Vector normal = objToWorld.timesVDirection(normalOS);
 
 			info.updateInfo(time, hitPoint, normal, this);
 
