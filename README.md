@@ -7,7 +7,6 @@ Multithreading
 
 Possible future features:
 More UV mapping
-Directional lights
 Input file parsing
 
 Primitives:
@@ -29,3 +28,5 @@ RoundedBox
 Ellipsoid
 Torus - Torus erronously casts shadows on itself 
 Sphere4
+
+![Alt text](saved_outputs\pencil.gif?raw=true "Pencil")
