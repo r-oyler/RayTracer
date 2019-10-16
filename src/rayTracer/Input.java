@@ -4,6 +4,7 @@ import javax.swing.JOptionPane;
 
 public class Input {
 
+	// Replaced with SettigsParser
 	public static Settings getSettings() {
 		
 		Settings s = new Settings();

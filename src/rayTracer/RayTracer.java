@@ -12,35 +12,12 @@ import javax.imageio.stream.ImageOutputStream;
 
 public class RayTracer {
 
+	public static final String settingsFilePath = "settings.ini";
 	private static ArrayList<Thread> arrThreads = new ArrayList<Thread>();
 
 	public static void main(String args[]) throws InterruptedException, IOException {
 		
-		Settings settings = new Settings();
-
-		boolean getUserInput = Input.getBoolean("Choose custom inputs?");
-
-		if (getUserInput) {
-			settings = Input.getSettings();
-		}
-
-		else {
-
-			settings.setMultithreading(true);
-			// Dimensions of image
-			settings.setWindowXY(1366, 768);
-			//The field of view of the camera.  This is 90 degrees because our imaginary image plane is 2 units high (-1->1) and 1 unit from the camera position
-			settings.setFov(90);
-
-			// Settings for supersampling anti-aliasing
-			settings.setSSColRowMax(1,1);
-
-			// Maximum depth that reflection/refraction rays are cast
-			settings.setMaxRecursionDepth(7);
-			// Distance that shadow ray origins are moved along the surface normal to prevent shadow acne
-			settings.setBias(0.0001);		
-
-		}
+		Settings settings = SettingsParser.parseFile(settingsFilePath);
 
 		Scene scene;
 

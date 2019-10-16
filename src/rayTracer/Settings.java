@@ -1,7 +1,7 @@
 package rayTracer;
 
 public class Settings {
-
+	
 	boolean multithreading = false;
 	
 	// Dimensions of image
@@ -14,8 +14,7 @@ public class Settings {
 	int ssRowMax = 1;
 	// Maximum depth that reflection/refraction rays are cast
 	int maxRecursionDepth = 7;
-	// Distance that shadow ray origins are moved along the surface normal to prevent shadow acne
-	// Used similarly for reflection rays and refraction rays
+	// Distance that shadow ray, reflection ray and refraction ray origins are moved along the surface normal to prevent shadow acne
 	double bias = 0.0001;
 	
 	// Calculated values
@@ -29,7 +28,7 @@ public class Settings {
 	public Settings() {
 
 	}
-
+	
 	// The window aspect ratio
 	public void calcAspectRatio() {
 		this.aspectRatio = (double)this.windowX/(double)this.windowY;
@@ -70,6 +69,9 @@ public class Settings {
 	}
 
 	public void setWindowXY(int windowX, int windowY) {
+		if (windowX <= 0) throw new IllegalArgumentException("Image width must not be less than or equal to 0.\nValue entered: "+ windowX);
+		if (windowY <= 0) throw new IllegalArgumentException("Image height must not be less than or equal to 0.\nValue entered: "+ windowY);
+		
 		this.windowX = windowX;
 		this.windowY = windowY;
 		this.calcAspectRatio();
@@ -85,6 +87,8 @@ public class Settings {
 	}
 
 	public void setFov(double fov) {
+		if (fov <= 0) throw new IllegalArgumentException("Field of view must not be less than or equal to 0.\nValue entered: "+ fov);
+		
 		this.fov = fov;
 		this.calcFovAdjust();
 	}
@@ -98,6 +102,9 @@ public class Settings {
 	}
 
 	public void setSSColRowMax(int ssColumnMax, int ssRowMax) {
+		if (ssColumnMax <= 0) throw new IllegalArgumentException("Supersampling grid width must not be less than or equal to 0.\nValue entered: "+ ssColumnMax);
+		if (ssRowMax <= 0) throw new IllegalArgumentException("Supersampling grid height must not be less than or equal to 0.\nValue entered: "+ ssRowMax);
+		
 		this.ssColumnMax = ssColumnMax;
 		this.ssRowMax = ssRowMax;
 		this.calcTotalSubPixels();
@@ -110,6 +117,8 @@ public class Settings {
 	}
 
 	public void setMaxRecursionDepth(int maxRecursionDepth) {
+		if (maxRecursionDepth < 0) throw new IllegalArgumentException("Max recursion depth must not be less than 0.\nValue entered: "+ maxRecursionDepth);
+		
 		this.maxRecursionDepth = maxRecursionDepth;
 	}
 
@@ -118,6 +127,8 @@ public class Settings {
 	}
 
 	public void setBias(double bias) {
+		if (bias < 0) throw new IllegalArgumentException("Bias must not be less than 0.\nValue entered: "+ bias);
+		
 		this.bias = bias;
 	}
 
